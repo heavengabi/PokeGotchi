@@ -1,10 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
 
 const CardPoke = () => {
     return (
         <View style={styles.containerdex}>
-            
+                <Image 
+                  source={require("../image/Totodile.jpg")} 
+                  style={styles.cardpokemon}
+                />
         </View>
     )
 }
@@ -13,18 +16,20 @@ export default CardPoke
 
 const styles = StyleSheet.create({
     containerdex: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: "black",
         borderRadius: 5,
-        width: 150,
-        height: 150
-
+        width: '80%',
+        height: 300
     },
-    container: {
+    cardpokemon: {
         backgroundColor: "white",
-        borderRadius: 5,
+        borderRadius: 50,
         boxShadow: "2px 5px 5px blue",
-        width: 100,
-        height: 100
+        width: "90%",
+        height: "90%"
     }
 
 })
