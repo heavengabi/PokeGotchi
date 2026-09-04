@@ -1,12 +1,16 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 
-const Navbar = () => {
+interface Props {
+  aoTrocar: () => void
+}
+
+const Navbar = ({ aoTrocar }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.iconeContainer}>
-        <Image 
-          source={require("../image/Cartoon_Pokeball_Sticker-removebg-preview.png")} 
+        <Image
+          source={require('../image/Cartoon_Pokeball_Sticker-removebg-preview.png')}
           style={styles.imagemPokeball}
         />
       </View>
@@ -16,7 +20,9 @@ const Navbar = () => {
         <Text style={styles.subtitle}>Pocket Partner</Text>
       </View>
 
-      
+      <TouchableOpacity onPress={aoTrocar}>
+        <Text style={styles.textoTrocar}>Trocar</Text>
+      </TouchableOpacity>
     </View>
   )
 }
@@ -28,50 +34,58 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 20,
     backgroundColor: 'rgba(211, 12, 12, 1)',
-    flexDirection: 'row',        
-    alignItems: 'center',        
-    justifyContent: 'flex-start',
-    gap: 15,                     
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 15,
   },
   iconeContainer: {
     width: 60,
     height: 60,
     backgroundColor: 'yellow',
-    borderRadius: 30,            
+    borderRadius: 30,
     borderWidth: 3,
     borderColor: '#000',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  imagemPokeball: {
-    width: 65,
-    height: 65,
-    resizeMode: 'contain',
+  imagemPokeball: { 
+    width: 65, 
+    height: 65, 
+    resizeMode: 'contain' 
   },
-  textosContainer: {
-    flexDirection: 'column',     // Mantém o subtítulo abaixo do título principal
-    justifyContent: 'center',
+  textosContainer: { 
+    flex: 1, 
+    marginLeft: 10 
   },
   titulo: {
-    fontSize: 32,
-    fontFamily: 'Impact',
+    fontSize: 26,
+    fontWeight: '900',
     letterSpacing: 3,
-    fontWeight: '200',
     color: 'rgba(255, 196, 0, 1)',
     textShadowColor: 'blue',
-    textShadowOffset: { width: 2, height: 2 },
+    textShadowOffset: { 
+      width: 2, 
+      height: 2 
+    },
     textShadowRadius: 1,
-    transform: [{ scaleY: 0.85 }],
   },
   subtitle: {
     color: 'white',
-    fontFamily: 'Knockout',
     letterSpacing: 2,
     fontSize: 11,
     textShadowColor: 'black',
-    textShadowOffset: { width: 1, height: 1 },
+    textShadowOffset: { 
+      width: 1, 
+      height: 1 
+    },
     textShadowRadius: 1,
     fontWeight: '800',
     marginTop: -4,
+  },
+  textoTrocar: { 
+    color: '#fff', 
+    fontWeight: '700', 
+    fontSize: 14 
   },
 })

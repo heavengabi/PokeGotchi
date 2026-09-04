@@ -1,21 +1,26 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import Atributos from './components/Atributos';
-import Pokemon from './pages/Pokemon';
+import React, { useState } from 'react'
+import { StyleSheet, View } from 'react-native'
+import { Provider as PaperProvider } from 'react-native-paper'
+import Pokemon from './pages/Pokemon'
 
 export default function App() {
+  // Único "dono" do pokémon do jogo. Como useContext é proibido, esse
+  // state precisa ser passado via props pras duas telas (seleção e principal).
+  const [pokemon, setPokemon] = useState< PokeJogo | null>(null)
+
   return (
-    <View style={styles.container}>
-      <Pokemon/>
-    </View>
-  );
+    <PaperProvider>
+      <View style={styles.container}>
+        {!pokemon ? (
+          <SelecaoInicial onEscolher={setPokemon} />
+        ) : (
+          <Pokemon pokemon={pokemon} setPokemon={setPokemon} aoTrocar={() => setPokemon(null)} />
+        )}
+      </View>
+    </PaperProvider>
+  )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  container: { flex: 1, backgroundColor: '#f5f1e8' },
+})

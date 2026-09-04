@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
+import { ProgressBar } from 'react-native-paper'
 import React from 'react'
 
 interface Props {
@@ -10,33 +11,34 @@ interface Props {
 
 const Atributos = ({ fome, felicidade, energia, higiene }: Props) => {
   return (
-    <View style={styles.containerdex}>
-      <View style={styles.container}>
+    <View style={styles.card}>
+      <View style={styles.cabecalho}>
+        <Text style={styles.titulo}>CUIDADOS</Text>
+        <Text style={styles.subtitulo}>Atualiza a cada 5s</Text>
+      </View>
 
-        <Text style={styles.text}>🍖 Saciedade</Text>
-        <View style={styles.trilho}>
-          <View style={[styles.preenchimento, { width: `${fome}%`, backgroundColor: '#f59e0b' }]} />
-        </View>
+      <Text style={styles.rotulo}>🍖 Saciedade</Text>
+      <View style={styles.linha}>
+        <ProgressBar progress={fome / 100} color={corPorValor(fome)} style={styles.barra} />
         <Text style={styles.porcentagem}>{fome}%</Text>
+      </View>
 
-        <Text style={styles.text}>😁 Felicidade</Text>
-        <View style={styles.trilho}>
-          <View style={[styles.preenchimento, { width: `${felicidade}%`, backgroundColor: '#ec4899' }]} />
-        </View>
+      <Text style={styles.rotulo}>💗 Felicidade</Text>
+      <View style={styles.linha}>
+        <ProgressBar progress={felicidade / 100} color={corPorValor(felicidade)} style={styles.barra} />
         <Text style={styles.porcentagem}>{felicidade}%</Text>
+      </View>
 
-        <Text style={styles.text}>⚡ Energia</Text>
-        <View style={styles.trilho}>
-          <View style={[styles.preenchimento, { width: `${energia}%`, backgroundColor: '#3b82f6' }]} />
-        </View>
+      <Text style={styles.rotulo}>⚡ Energia</Text>
+      <View style={styles.linha}>
+        <ProgressBar progress={energia / 100} color={corPorValor(energia)} style={styles.barra} />
         <Text style={styles.porcentagem}>{energia}%</Text>
+      </View>
 
-        <Text style={styles.text}>✨ Higiene</Text>
-        <View style={styles.trilho}>
-          <View style={[styles.preenchimento, { width: `${higiene}%`, backgroundColor: '#10b981' }]} />
-        </View>
+      <Text style={styles.rotulo}>✨ Higiene</Text>
+      <View style={styles.linha}>
+        <ProgressBar progress={higiene / 100} color={corPorValor(higiene)} style={styles.barra} />
         <Text style={styles.porcentagem}>{higiene}%</Text>
-
       </View>
     </View>
   )
@@ -45,40 +47,50 @@ const Atributos = ({ fome, felicidade, energia, higiene }: Props) => {
 export default Atributos
 
 const styles = StyleSheet.create({
-  containerdex: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'black',
-    borderRadius: 5,
-    width: '80%',
-    padding: 12,
-  },
-  container: {
-    justifyContent: 'center',
-    backgroundColor: 'yellow',
-    borderRadius: 20,
+  card: {
     width: '90%',
-    padding: 12,
+    alignSelf: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
   },
-  text: {
-    textAlign: 'center',
-    fontSize: 20,
-    fontFamily: 'Inter',
-    marginBottom: 4,
+  cabecalho: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginBottom: 8 
   },
-  trilho: {
-    height: 12,
-    backgroundColor: '#00000030',
-    borderRadius: 6,
-    overflow: 'hidden',
+  titulo: { 
+    fontSize: 16, 
+    fontWeight: '800' 
   },
-  preenchimento: {
-    height: '100%',
-    borderRadius: 6,
+  subtitulo: { 
+    fontSize: 11, 
+    color: '#9ca3af' 
   },
-  porcentagem: {
-    fontSize: 12,
-    textAlign: 'right',
-    marginBottom: 10,
+  rotulo: { 
+    fontWeight: '700',
+    marginBottom: 4, 
+    marginTop: 8 
+  },
+  linha: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 8 
+  },
+  barra: { 
+    flex: 1, 
+    height: 10, 
+    borderRadius: 5 
+  },
+  porcentagem: { 
+    fontWeight: '700',
+    width: 42, 
+    textAlign: 'right' 
   },
 })
