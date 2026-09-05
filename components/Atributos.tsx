@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import { ProgressBar } from 'react-native-paper'
 import React from 'react'
+import { corPorValor } from '../utils/atributos'
 
 interface Props {
   fome: number
