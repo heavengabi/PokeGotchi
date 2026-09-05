@@ -10,8 +10,6 @@ export interface PokeJogo {
   nome: string
   imagem: string
   tipos: string[]
-  alturaMetros: number
-  pesoKg: number
   nivel: number
   experiencia: number
   experienciaProximoNivel: number

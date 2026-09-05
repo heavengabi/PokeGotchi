@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
 import { ProgressBar } from 'react-native-paper'
 import React from 'react'
+import { PokeJogo } from '../types/pokemon'
 
 interface Props {
-  pokemon: PokemonJogo
+  pokemon: PokeJogo
   mensagemStatus: string
 }
 
@@ -43,10 +44,6 @@ const CardPoke = ({ pokemon, mensagemStatus }: Props) => {
             <Text style={styles.textoBadge}>{pokemon.tipos[0].toUpperCase()}</Text>
           </View>
         </View>
-
-        <Text style={styles.medidas}>
-          Altura {pokemon.alturaMetros.toFixed(1)} m  •  Peso {pokemon.pesoKg.toFixed(1)} kg
-        </Text>
 
         <View style={styles.linhaNivel}>
           <Text style={styles.textoNivel}>NÍVEL {pokemon.nivel}</Text>
@@ -130,11 +127,6 @@ const styles = StyleSheet.create({
     color: '#fff', 
     fontWeight: '700', 
     fontSize: 12 
-  },
-  medidas: { 
-    color: '#6b7280', 
-    marginTop: 6, 
-    marginBottom: 12 
   },
   linhaNivel: { 
     flexDirection: 'row', 

@@ -27,7 +27,7 @@ export function obterMensagemStatus(atributos: AtributosPokemon): string {
 
 // Muda a cor da barra conforme criticidade — verde ok, amarelo alerta, vermelho crítico.
 export function corPorValor(valor: number): string {
-  if (valor <= 20) return '#ef4444'
-  if (valor <= 50) return '#f59e0b'
-  return '#22c55e'
+  if (valor <= 20) return 'red'
+  if (valor <= 50) return 'orange'
+  return 'green'
 }

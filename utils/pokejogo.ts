@@ -1,5 +1,5 @@
 import { PokeJogo } from '../types/pokemon'
-import { TABELA_EVOLUCAO } from '../data/evolucoes'
+import { TABELA_EVOLUCAO } from '../data/evolucoesPoke'
 import { ganharExperiencia } from './xpzinho'
 
 export interface ResultadoAcao {

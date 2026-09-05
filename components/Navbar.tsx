@@ -2,10 +2,10 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 
 interface Props {
-  aoTrocar: () => void
+  Trocar: () => void
 }
 
-const Navbar = ({ aoTrocar }: Props) => {
+const Navbar = ({ Trocar }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.iconeContainer}>
@@ -20,7 +20,7 @@ const Navbar = ({ aoTrocar }: Props) => {
         <Text style={styles.subtitle}>Pocket Partner</Text>
       </View>
 
-      <TouchableOpacity onPress={aoTrocar}>
+      <TouchableOpacity onPress={Trocar}>
         <Text style={styles.textoTrocar}>Trocar</Text>
       </TouchableOpacity>
     </View>

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import CardPoke from '../components/CardPoke'
 import Atributos from '../components/Atributos'
-import BotoesAcao from '../components/BotoesPoke'
 import Evento from '../components/Evento'
 import { PokeJogo } from '../types/pokemon'
 import { TABELA_EVOLUCAO } from '../data/evolucoesPoke'
@@ -11,17 +10,16 @@ import { buscarDetalhePokemon } from '../services/pokeAPI'
 import { aplicarDecaimento, obterMensagemStatus } from '../utils/atributos'
 import { ganharXpEChecarEvolucao } from '../utils/pokejogo'
 import BotoesPoke from '../components/BotoesPoke'
-import Evento from '../components/Evento'
 
-const INTERVALO_DECAIMENTO_MS = 5000 // passagem do tempo: atributos caem a cada 5s
+const TempoAtributos = 5000 // passagem do tempo: atributos caem a cada 5s
 
 interface Props {
   pokemon: PokeJogo
   setPokemon: React.Dispatch<React.SetStateAction<PokeJogo | null>>
-  aoTrocar: () => void
+  Trocar: () => void
 }
 
-const Pokemon = ({ pokemon, setPokemon, aoTrocar }: Props) => {
+const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
   const [mensagemEvento, setMensagemEvento] = useState<string | null>(null)
   const [evoluindo, setEvoluindo] = useState(false)
 
@@ -32,7 +30,7 @@ const Pokemon = ({ pokemon, setPokemon, aoTrocar }: Props) => {
   useEffect(() => {
     const intervalo = setInterval(() => {
       setPokemon((prev) => (prev ? { ...prev, atributos: aplicarDecaimento(prev.atributos) } : prev))
-    }, INTERVALO_DECAIMENTO_MS)
+    }, TempoAtributos)
     return () => clearInterval(intervalo)
   }, [setPokemon])
 
@@ -59,8 +57,6 @@ const Pokemon = ({ pokemon, setPokemon, aoTrocar }: Props) => {
                 nome: proximo.nome,
                 imagem: proximo.imagem,
                 tipos: proximo.tipos,
-                alturaMetros: proximo.alturaMetros,
-                pesoKg: proximo.pesoKg,
                 precisaEvoluir: false,
               }
             : prev
@@ -124,7 +120,7 @@ const Pokemon = ({ pokemon, setPokemon, aoTrocar }: Props) => {
 
   return (
     <>
-      <Navbar aoTrocar={aoTrocar} />
+      <Navbar Trocar={Trocar} />
       <ScrollView contentContainerStyle={styles.conteudo}>
         <CardPoke pokemon={pokemon} mensagemStatus={mensagemStatus} />
         {mensagemEvento && <Evento mensagem={mensagemEvento} />}
@@ -135,11 +131,11 @@ const Pokemon = ({ pokemon, setPokemon, aoTrocar }: Props) => {
           higiene={pokemon.atributos.higiene}
         />
         <BotoesPoke
-          aoAlimentar={alimentar}
-          aoBrincar={brincar}
-          aoDormir={dormir}
-          aoLimpar={limpar}
-          aoTreinar={treinar}
+          Alimentar={alimentar}
+          Brincar={brincar}
+          Dormir={dormir}
+          Limpar={limpar}
+          Treinar={treinar}
         />
         <Text style={styles.rodape}>Dados dos Pokémon: PokéAPI</Text>
       </ScrollView>
