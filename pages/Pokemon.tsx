@@ -145,7 +145,6 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
           Limpar={limpar}
           Treinar={treinar}
         />
-        <Text style={styles.rodape}>Dados dos Pokémon: PokéAPI</Text>
       </ScrollView>
     </>
   )
