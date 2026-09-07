@@ -26,25 +26,33 @@ const Atributos = ({ fome, felicidade, energia, higiene }: Props) => {
 
         <Text style={styles.rotulo}>🍖 Saciedade</Text>
         <View style={styles.linha}>
-          <ProgressBar progress={fome / 100} color={corPorValor(fome)} style={styles.barra} />
+          <View style={{ flex: 1, overflow: 'hidden' }}>
+            <ProgressBar progress={fome / 100} color={corPorValor(fome)} style={styles.barra} />
+          </View>
           <Text style={styles.porcentagem}>{fome}%</Text>
         </View>
 
         <Text style={styles.rotulo}>💗 Felicidade</Text>
         <View style={styles.linha}>
-          <ProgressBar progress={felicidade / 100} color={corPorValor(felicidade)} style={styles.barra} />
+          <View style={{ flex: 1, overflow: 'hidden' }}>
+            <ProgressBar progress={felicidade / 100} color={corPorValor(felicidade)} style={styles.barra} />
+          </View>
           <Text style={styles.porcentagem}>{felicidade}%</Text>
         </View>
 
         <Text style={styles.rotulo}>⚡ Energia</Text>
         <View style={styles.linha}>
-          <ProgressBar progress={energia / 100} color={corPorValor(energia)} style={styles.barra} />
+          <View style={{ flex: 1, overflow: 'hidden' }}>
+            <ProgressBar progress={energia / 100} color={corPorValor(energia)} style={styles.barra} />
+          </View>
           <Text style={styles.porcentagem}>{energia}%</Text>
         </View>
 
         <Text style={styles.rotulo}>✨ Higiene</Text>
         <View style={styles.linha}>
-          <ProgressBar progress={higiene / 100} color={corPorValor(higiene)} style={styles.barra} />
+          <View style={{ flex: 1, overflow: 'hidden' }}>
+            <ProgressBar progress={higiene / 100} color={corPorValor(higiene)} style={styles.barra} />
+          </View>
           <Text style={styles.porcentagem}>{higiene}%</Text>
         </View>
       </View>
@@ -101,7 +109,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   barra: {
-    flex: 1,
     height: 10,
     borderRadius: 5,
   },

@@ -8,7 +8,7 @@ import Evento from '../components/Evento'
 import { PokeJogo } from '../types/pokemon'
 import { TABELA_EVOLUCAO } from '../data/evolucoesPoke'
 import { buscarDetalhePokemon } from '../services/pokeAPI'
-import { aplicarDecaimento, obterMensagemStatus } from '../utils/atributos'
+import { aplicarDecaimento, obterMensagemStatus, podeTreinar } from '../utils/atributos'
 import { ganharXpEChecarEvolucao } from '../utils/pokejogo'
 import { salvarPokemon } from '../utils/progressoPokemon'
 import BotoesPoke from '../components/BotoesPoke'
@@ -197,9 +197,15 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
     setMensagemEvento(mensagem)
   }
 
-  // Treinar
-  // Gasta energia, aumenta a fome e dá 20 XP.
+  // Trava: só treina se ainda tiver fome e energia acima de zero.
+  // Sem essa checagem, o jogador conseguia treinar infinitamente mesmo
+  // com o pokémon sem energia/comida nenhuma, o que não faz sentido no jogo.
   function treinar() {
+    if (!podeTreinar(pokemon.atributos)) {
+      setMensagemEvento('Sem energia ou fome suficiente pra treinar!')
+      return
+    }
+
     const comAtributos: PokeJogo = {
       ...pokemon,
       atributos: {
@@ -253,11 +259,6 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
           Limpar={limpar}
           Treinar={treinar}
         />
-
-        <Text style={styles.rodape}>
-          Dados dos Pokémon: PokéAPI
-        </Text>
-
       </ScrollView>
     </>
   )

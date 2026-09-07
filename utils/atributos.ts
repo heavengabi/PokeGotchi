@@ -31,3 +31,9 @@ export function corPorValor(valor: number): string {
   if (valor <= 50) return 'orange'
   return 'green'
 }
+
+// Bloqueia o treino quando saciedade ou energia estão zeradas.
+// Só volta a permitir treinar depois que o jogador alimentar ou deixar dormir o pokémon.
+export function podeTreinar(atributos: AtributosPokemon): boolean {
+  return atributos.fome > 0 && atributos.energia > 0
+}
