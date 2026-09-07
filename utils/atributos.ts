@@ -5,7 +5,9 @@ export function limitar(valor: number): number {
 }
 
 // Passagem do tempo: chamado a cada tick do setInterval na tela principal.
-export function aplicarDecaimento(atributos: AtributosPokemon): AtributosPokemon {
+export function aplicarDecaimento(
+  atributos: AtributosPokemon
+): AtributosPokemon {
   return {
     fome: limitar(atributos.fome - 3),
     felicidade: limitar(atributos.felicidade - 2),
@@ -14,18 +16,27 @@ export function aplicarDecaimento(atributos: AtributosPokemon): AtributosPokemon
   }
 }
 
-export function obterMensagemStatus(atributos: AtributosPokemon): string {
+export function obterMensagemStatus(
+  atributos: AtributosPokemon
+): string {
   if (atributos.fome <= 20) return 'Estou com fome!'
   if (atributos.energia <= 20) return 'Estou cansado...'
   if (atributos.higiene <= 20) return 'Preciso de um banho!'
   if (atributos.felicidade <= 20) return 'Estou triste...'
-  if (atributos.fome <= 50 || atributos.energia <= 50 || atributos.felicidade <= 50 || atributos.higiene <= 50) {
+
+  if (
+    atributos.fome <= 50 ||
+    atributos.energia <= 50 ||
+    atributos.felicidade <= 50 ||
+    atributos.higiene <= 50
+  ) {
     return 'Estou bem, mas já vi dias melhores.'
   }
+
   return 'Estou incrível! ⚡'
 }
 
-// Muda a cor da barra conforme criticidade — verde ok, amarelo alerta, vermelho crítico.
+// Muda a cor da barra conforme a criticidade.
 export function corPorValor(valor: number): string {
   if (valor <= 20) return 'red'
   if (valor <= 50) return 'orange'

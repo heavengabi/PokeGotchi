@@ -1,19 +1,37 @@
+
+
 export interface RegraEvolucao {
   proximoId: number
   nivelNecessario: number
 }
 
-// Chave = speciesId atual. null = forma final, não evolui mais.
+// Chave = speciesId atual.
+// null = forma final, não evolui mais.
 export const TABELA_EVOLUCAO: Record<number, RegraEvolucao | null> = {
-  1: { proximoId: 2, nivelNecessario: 16 },  // Bulbasaur -> Ivysaur
-  2: { proximoId: 3, nivelNecessario: 32 },  // Ivysaur -> Venusaur
+  // Bulbasaur
+  1: { proximoId: 2, nivelNecessario: 16 },
+  2: { proximoId: 3, nivelNecessario: 32 },
   3: null,
-  4: { proximoId: 5, nivelNecessario: 16 },  // Charmander -> Charmeleon
-  5: { proximoId: 6, nivelNecessario: 36 },  // Charmeleon -> Charizard
+
+  // Charmander
+  4: { proximoId: 5, nivelNecessario: 16 },
+  5: { proximoId: 6, nivelNecessario: 36 },
   6: null,
-  7: { proximoId: 8, nivelNecessario: 16 },  // Squirtle -> Wartortle
-  8: { proximoId: 9, nivelNecessario: 36 },  // Wartortle -> Blastoise
+
+  // Squirtle
+  7: { proximoId: 8, nivelNecessario: 16 },
+  8: { proximoId: 9, nivelNecessario: 36 },
   9: null,
+
+  // Totodile
+  158: { proximoId: 159, nivelNecessario: 18 },
+  159: { proximoId: 160, nivelNecessario: 30 },
+  160: null,
 }
 
-export const IDS_STARTERS = [1, 4, 7] // Bulbasaur, Charmander, Squirtle
+export const IDS_STARTERS = [1, 4, 7, 158]
+
+
+
+
+

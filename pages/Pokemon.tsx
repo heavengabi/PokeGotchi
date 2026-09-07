@@ -1,5 +1,7 @@
+
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import React, { useEffect, useState } from 'react'
+
 import Navbar from '../components/Navbar'
 import CardPoke from '../components/CardPoke'
 import Atributos from '../components/Atributos'
@@ -9,6 +11,7 @@ import { TABELA_EVOLUCAO } from '../data/evolucoesPoke'
 import { buscarDetalhePokemon } from '../services/pokeAPI'
 import { aplicarDecaimento, obterMensagemStatus } from '../utils/atributos'
 import { ganharXpEChecarEvolucao } from '../utils/pokejogo'
+import { salvarPokemon } from '../utils/progressoPokemon'
 import BotoesPoke from '../components/BotoesPoke'
 
 const TempoAtributos = 5000 // passagem do tempo: atributos caem a cada 5s
@@ -23,6 +26,17 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
   const [mensagemEvento, setMensagemEvento] = useState<string | null>(null)
   const [evoluindo, setEvoluindo] = useState(false)
 
+  // =====================================================
+  // SALVAR PROGRESSO
+  // =====================================================
+
+  // Alteração: salva automaticamente o Pokémon sempre que
+  // ele mudar. Isso permite que a seleção encontre a
+  // evolução depois que o jogador clicar em "Trocar".
+  useEffect(() => {
+    salvarPokemon(pokemon)
+  }, [pokemon])
+
   // Passagem do tempo (requisito 4): a cada 5s os atributos decaem.
   // Usa a forma funcional do setState (prev => ...) porque a função do
   // setInterval é criada uma vez só no primeiro render e, sem isso,
@@ -31,6 +45,7 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
     const intervalo = setInterval(() => {
       setPokemon((prev) => (prev ? { ...prev, atributos: aplicarDecaimento(prev.atributos) } : prev))
     }, TempoAtributos)
+
     return () => clearInterval(intervalo)
   }, [setPokemon])
 
@@ -43,12 +58,16 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
     if (!pokemon.precisaEvoluir || evoluindo) return
 
     setEvoluindo(true)
+
     async function evoluir() {
       const regra = TABELA_EVOLUCAO[pokemon.speciesId]
+
       if (!regra) return
+
       try {
         const proximo = await buscarDetalhePokemon(regra.proximoId)
         const nomeAntigo = pokemon.nome
+
         setPokemon((prev) =>
           prev
             ? {
@@ -61,6 +80,7 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
               }
             : prev
         )
+
         setMensagemEvento(`${nomeAntigo} evoluiu para ${proximo.nome}! 🎉`)
       } catch (erro) {
         console.error('Erro ao evoluir pokémon', erro)
@@ -68,23 +88,45 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
         setEvoluindo(false)
       }
     }
+
     evoluir()
   }, [pokemon.precisaEvoluir, pokemon.speciesId, evoluindo])
 
   // Ações do jogador (requisito 5)
   function alimentar() {
     setMensagemEvento(null)
-    setPokemon({ ...pokemon, atributos: { ...pokemon.atributos, fome: Math.min(100, pokemon.atributos.fome + 30) } })
+
+    setPokemon({
+      ...pokemon,
+      atributos: {
+        ...pokemon.atributos,
+        fome: Math.min(100, pokemon.atributos.fome + 30),
+      },
+    })
   }
 
   function dormir() {
     setMensagemEvento(null)
-    setPokemon({ ...pokemon, atributos: { ...pokemon.atributos, energia: 100 } })
+
+    setPokemon({
+      ...pokemon,
+      atributos: {
+        ...pokemon.atributos,
+        energia: 100,
+      },
+    })
   }
 
   function limpar() {
     setMensagemEvento(null)
-    setPokemon({ ...pokemon, atributos: { ...pokemon.atributos, higiene: 100 } })
+
+    setPokemon({
+      ...pokemon,
+      atributos: {
+        ...pokemon.atributos,
+        higiene: 100,
+      },
+    })
   }
 
   function brincar() {
@@ -97,7 +139,10 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
         fome: Math.max(0, pokemon.atributos.fome - 5),
       },
     }
-    const { pokemon: atualizado, mensagem } = ganharXpEChecarEvolucao(comAtributos, 5)
+
+    const { pokemon: atualizado, mensagem } =
+      ganharXpEChecarEvolucao(comAtributos, 5)
+
     setPokemon(atualizado)
     setMensagemEvento(mensagem)
   }
@@ -111,7 +156,10 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
         fome: Math.max(0, pokemon.atributos.fome - 15),
       },
     }
-    const { pokemon: atualizado, mensagem } = ganharXpEChecarEvolucao(comAtributos, 100)
+
+    const { pokemon: atualizado, mensagem } =
+      ganharXpEChecarEvolucao(comAtributos, 100)
+
     setPokemon(atualizado)
     setMensagemEvento(mensagem)
   }
@@ -121,15 +169,25 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
   return (
     <>
       <Navbar Trocar={Trocar} />
+
       <ScrollView contentContainerStyle={styles.conteudo}>
-        <CardPoke pokemon={pokemon} mensagemStatus={mensagemStatus} />
-        {mensagemEvento && <Evento mensagem={mensagemEvento} />}
+
+        <CardPoke
+          pokemon={pokemon}
+          mensagemStatus={mensagemStatus}
+        />
+
+        {mensagemEvento && (
+          <Evento mensagem={mensagemEvento} />
+        )}
+
         <Atributos
           fome={pokemon.atributos.fome}
           felicidade={pokemon.atributos.felicidade}
           energia={pokemon.atributos.energia}
           higiene={pokemon.atributos.higiene}
         />
+
         <BotoesPoke
           Alimentar={alimentar}
           Brincar={brincar}
@@ -137,7 +195,11 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
           Limpar={limpar}
           Treinar={treinar}
         />
-        <Text style={styles.rodape}>Dados dos Pokémon: PokéAPI</Text>
+
+        <Text style={styles.rodape}>
+          Dados dos Pokémon: PokéAPI
+        </Text>
+
       </ScrollView>
     </>
   )
@@ -146,6 +208,16 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
 export default Pokemon
 
 const styles = StyleSheet.create({
-  conteudo: { backgroundColor: '#f5f1e8', paddingTop: 16, paddingBottom: 32, alignItems: 'center' },
-  rodape: { color: '#9ca3af', fontSize: 12, marginTop: 8 },
+  conteudo: {
+    backgroundColor: '#f5f1e8',
+    paddingTop: 16,
+    paddingBottom: 32,
+    alignItems: 'center',
+  },
+
+  rodape: {
+    color: '#9ca3af',
+    fontSize: 12,
+    marginTop: 8,
+  },
 })
