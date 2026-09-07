@@ -6,16 +6,18 @@ import {
   StyleSheet,
   Text,
   View,
-  ImageBackground
+  ImageBackground,
+  Image
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ScreenOrientation from "expo-screen-orientation";
+
+
 import fundo from "../image/fundo.jpg";
 import { PokeJogo } from "../types/pokemon";
 import CardSelecao from "../components/CardSelecao";
 import { carregarPokemon } from "../utils/progressoPokemon";
 import { TABELA_EVOLUCAO } from "../data/evolucoesPoke";
-
 
 interface Props {
   onEscolher: (pokemon: PokeJogo) => void;
@@ -26,7 +28,7 @@ const pokemonsIniciais: PokeJogo[] = [
     speciesId: 4,
     nome: "charmander",
     imagem:
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/4.gif",
     tipos: ["fire"],
     nivel: 1,
     experiencia: 0,
@@ -44,7 +46,7 @@ const pokemonsIniciais: PokeJogo[] = [
     speciesId: 7,
     nome: "squirtle",
     imagem:
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/7.gif",
     tipos: ["water"],
     nivel: 1,
     experiencia: 0,
@@ -62,7 +64,7 @@ const pokemonsIniciais: PokeJogo[] = [
     speciesId: 1,
     nome: "bulbasaur",
     imagem:
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/1.gif",
     tipos: ["grass", "poison"],
     nivel: 1,
     experiencia: 0,
@@ -80,7 +82,7 @@ const pokemonsIniciais: PokeJogo[] = [
     speciesId: 158,
     nome: "totodile",
     imagem:
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/158.png",
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/158.gif",
     tipos: ["water"],
     nivel: 1,
     experiencia: 0,
@@ -102,13 +104,9 @@ export default function SelecaoTeste({ onEscolher }: Props) {
   const [indiceSelecionado, setIndiceSelecionado] =
     useState(0);
 
-
   useEffect(() => {
-
     async function carregarProgresso() {
-
       try {
-
         /*
          * Para cada Pokémon inicial, procuramos
          * também suas possíveis evoluções.
@@ -124,10 +122,8 @@ export default function SelecaoTeste({ onEscolher }: Props) {
 
         const pokemonsSalvos =
           await Promise.all(
-
             pokemonsIniciais.map(
               async (pokemonInicial) => {
-
                 /*
                  * Primeiro procuramos o Pokémon inicial.
                  */
@@ -142,7 +138,6 @@ export default function SelecaoTeste({ onEscolher }: Props) {
                 let idAtual =
                   pokemonInicial.speciesId;
 
-
                 /*
                  * Continua seguindo a tabela de evolução
                  * enquanto existir uma próxima forma.
@@ -150,7 +145,6 @@ export default function SelecaoTeste({ onEscolher }: Props) {
                 while (
                   TABELA_EVOLUCAO[idAtual]
                 ) {
-
                   const regra =
                     TABELA_EVOLUCAO[idAtual];
 
@@ -178,7 +172,6 @@ export default function SelecaoTeste({ onEscolher }: Props) {
                    * ela passa a ser o Pokémon atual.
                    */
                   if (pokemonEvoluido) {
-
                     pokemonAtual =
                       pokemonEvoluido;
 
@@ -194,9 +187,7 @@ export default function SelecaoTeste({ onEscolher }: Props) {
                      */
                     idAtual =
                       regra.proximoId;
-
                   } else {
-
                     /*
                      * Não encontrou a próxima evolução.
                      * Então paramos a procura.
@@ -232,9 +223,7 @@ export default function SelecaoTeste({ onEscolher }: Props) {
         setPokemons(
           pokemonsSalvos
         );
-
       } catch (erro) {
-
         console.error(
           "Erro ao carregar progresso dos Pokémon:",
           erro
@@ -243,30 +232,23 @@ export default function SelecaoTeste({ onEscolher }: Props) {
     }
 
     carregarProgresso();
-
   }, []);
-
 
   // =====================================================
   // LANDSCAPE
   // =====================================================
 
   useEffect(() => {
-
     ScreenOrientation.lockAsync(
       ScreenOrientation.OrientationLock.LANDSCAPE
     );
 
     return () => {
-
       ScreenOrientation.lockAsync(
         ScreenOrientation.OrientationLock.PORTRAIT
       );
-
     };
-
   }, []);
-
 
   // =====================================================
   // CONTROLES DOS CARDS
@@ -276,33 +258,26 @@ export default function SelecaoTeste({ onEscolher }: Props) {
     pokemons.length;
 
   const selecionar = (index: number) => {
-
     setIndiceSelecionado(index);
-
   };
 
   const anterior = () => {
-
     setIndiceSelecionado(
       (prev) =>
         prev === 0
           ? total - 1
           : prev - 1
     );
-
   };
 
   const proximo = () => {
-
     setIndiceSelecionado(
       (prev) =>
         prev === total - 1
           ? 0
           : prev + 1
     );
-
   };
-
 
   const idxAnterior =
     (indiceSelecionado - 1 + total) % total;
@@ -310,16 +285,12 @@ export default function SelecaoTeste({ onEscolher }: Props) {
   const idxProximo =
     (indiceSelecionado + 1) % total;
 
-
   const cardsVisiveis = [
-
     {
       pokemon:
         pokemons[idxAnterior],
-
       indexOriginal:
         idxAnterior,
-
       posicao:
         "esquerda",
     },
@@ -327,10 +298,8 @@ export default function SelecaoTeste({ onEscolher }: Props) {
     {
       pokemon:
         pokemons[indiceSelecionado],
-
       indexOriginal:
         indiceSelecionado,
-
       posicao:
         "centro",
     },
@@ -338,24 +307,18 @@ export default function SelecaoTeste({ onEscolher }: Props) {
     {
       pokemon:
         pokemons[idxProximo],
-
       indexOriginal:
         idxProximo,
-
       posicao:
         "direita",
     },
-
   ];
-
 
   const pokemonSelecionado =
     pokemons[indiceSelecionado];
 
-
   const larguraTela =
     Dimensions.get("window").width;
-
 
   const larguraCard =
     Math.min(
@@ -365,7 +328,6 @@ export default function SelecaoTeste({ onEscolher }: Props) {
         (larguraTela - 180) / 3
       )
     );
-
 
   // =====================================================
   // TELA
@@ -377,11 +339,9 @@ export default function SelecaoTeste({ onEscolher }: Props) {
       style={styles.background}
       resizeMode="cover"
     >
-
       <SafeAreaView
         style={styles.container}
       >
-
         <Text style={styles.titulo}>
           ESCOLHA SEU COMPANHEIRO
         </Text>
@@ -390,11 +350,9 @@ export default function SelecaoTeste({ onEscolher }: Props) {
           Escolha um Pokémon para começar sua aventura
         </Text>
 
-
         <View
           style={styles.cardsContainer}
         >
-
           {/* SETA ESQUERDA */}
 
           <Pressable
@@ -407,26 +365,21 @@ export default function SelecaoTeste({ onEscolher }: Props) {
             ]}
             hitSlop={12}
           >
-
             <Text
               style={styles.setaTexto}
             >
               ‹
             </Text>
-
           </Pressable>
-
 
           {/* CARDS */}
 
           {cardsVisiveis.map(
             (item) => {
-
               const eCentro =
                 item.posicao === "centro";
 
               return (
-
                 <Pressable
                   key={`${item.pokemon.speciesId}-${item.posicao}`}
                   onPress={() =>
@@ -445,7 +398,6 @@ export default function SelecaoTeste({ onEscolher }: Props) {
                       : styles.cardLateral,
                   ]}
                 >
-
                   <CardSelecao
                     pokemon={
                       item.pokemon
@@ -454,12 +406,10 @@ export default function SelecaoTeste({ onEscolher }: Props) {
                       eCentro
                     }
                   />
-
                 </Pressable>
               );
             }
           )}
-
 
           {/* SETA DIREITA */}
 
@@ -473,17 +423,13 @@ export default function SelecaoTeste({ onEscolher }: Props) {
             ]}
             hitSlop={12}
           >
-
             <Text
               style={styles.setaTexto}
             >
               ›
             </Text>
-
           </Pressable>
-
         </View>
-
 
         {/* =====================================================
           CONTROLES
@@ -492,14 +438,11 @@ export default function SelecaoTeste({ onEscolher }: Props) {
         <View
           style={styles.controles}
         >
-
           <View
             style={styles.bolinhas}
           >
-
             {pokemons.map(
               (pokemon, index) => (
-
                 <Pressable
                   key={`${pokemon.speciesId}-${index}`}
                   onPress={() =>
@@ -513,12 +456,9 @@ export default function SelecaoTeste({ onEscolher }: Props) {
                   ]}
                   hitSlop={8}
                 />
-
               )
             )}
-
           </View>
-
 
           {/* BOTÃO ESCOLHER */}
 
@@ -534,7 +474,6 @@ export default function SelecaoTeste({ onEscolher }: Props) {
               )
             }
           >
-
             <Text
               style={styles.textoBotao}
             >
@@ -546,24 +485,18 @@ export default function SelecaoTeste({ onEscolher }: Props) {
             >
               →
             </Text>
-
           </Pressable>
-
         </View>
-
       </SafeAreaView>
-
     </ImageBackground>
   );
 }
-
 
 // =====================================================
 // ESTILOS
 // =====================================================
 
 const styles = StyleSheet.create({
-
   background: {
     flex: 1,
     width: "100%",
@@ -736,5 +669,4 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "900",
   },
-
 });

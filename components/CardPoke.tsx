@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View, Image, ImageBackground } from 'react-native'
 import { ProgressBar } from 'react-native-paper'
 import React from 'react'
 import { PokeJogo } from '../types/pokemon'
@@ -25,14 +25,19 @@ const CardPoke = ({ pokemon, mensagemStatus }: Props) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.moldura}>
+      <ImageBackground
+        source={require('../image/molduracerta.jpg')}
+        style={styles.moldura}
+        imageStyle={styles.imagemMoldura}
+        resizeMode="stretch"
+      >
         <View style={styles.tela}>
           <Image source={{ uri: pokemon.imagem }} style={styles.imagemPokemon} resizeMode="contain" />
           <View style={styles.bolhaFala}>
             <Text style={styles.textoBolha}>{mensagemStatus}</Text>
           </View>
         </View>
-      </View>
+      </ImageBackground>
 
       <View style={styles.infoCard}>
         <View style={styles.linhaTopo}>
@@ -58,27 +63,28 @@ const CardPoke = ({ pokemon, mensagemStatus }: Props) => {
 export default CardPoke
 
 const styles = StyleSheet.create({
-  container: { 
+  container: {
     width: '90%',
-    alignSelf: 'center' 
+    alignSelf: 'center',
   },
-  moldura: { 
-    backgroundColor: '#dc2626', 
-    borderRadius: 24, 
-    padding: 10 
+  moldura: {
+    width: '100%',
+    borderRadius: 24,
+    overflow: 'hidden',
+  },
+  imagemMoldura: {
+    width: "100%",
+    height: "auto",
+    borderRadius: 24,
   },
   tela: {
-    backgroundColor: '#dbeafe',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#000',
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 24,
   },
-  imagemPokemon: { 
-    width: 160, 
-    height: 160 
+  imagemPokemon: {
+    width: 180,
+    height: 200,
   },
   bolhaFala: {
     backgroundColor: '#fff',
@@ -89,9 +95,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     marginTop: 12,
   },
-  textoBolha: { 
-    fontWeight: '700', 
-    fontSize: 14 
+  textoBolha: {
+    fontWeight: '700',
+    fontSize: 14,
   },
   infoCard: {
     backgroundColor: '#fff',
@@ -104,45 +110,45 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
   },
-  linhaTopo: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'flex-start' 
+  linhaTopo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
-  nome: { 
-    fontSize: 22, 
-    fontWeight: '800', 
-    textTransform: 'capitalize' 
+  nome: {
+    fontSize: 22,
+    fontWeight: '800',
+    textTransform: 'capitalize',
   },
-  numero: { 
-    color: '#6b7280', 
-    fontWeight: '600' 
+  numero: {
+    color: '#6b7280',
+    fontWeight: '600',
   },
-  badgeTipo: { 
-    paddingVertical: 4, 
-    paddingHorizontal: 12, 
-    borderRadius: 12 
+  badgeTipo: {
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 12,
   },
-  textoBadge: { 
-    color: '#fff', 
-    fontWeight: '700', 
-    fontSize: 12 
+  textoBadge: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 12,
   },
-  linhaNivel: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    marginBottom: 4 
+  linhaNivel: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
-  textoNivel: { 
-    fontWeight: '700', 
-    color: '#111827' 
+  textoNivel: {
+    fontWeight: '700',
+    color: '#111827',
   },
-  textoExp: { 
-    color: '#6b7280', 
-    fontWeight: '600' 
+  textoExp: {
+    color: '#6b7280',
+    fontWeight: '600',
   },
-  barraExp: { 
-    height: 8, 
-    borderRadius: 4 
+  barraExp: {
+    height: 8,
+    borderRadius: 4,
   },
 })

@@ -1,7 +1,6 @@
-
 import React from "react";
 import { StyleSheet, Image, View } from "react-native";
-import { Card, Text, Chip } from "react-native-paper";
+import { Card, Text } from "react-native-paper";
 import { PokeJogo } from "../types/pokemon";
 
 interface Props {
@@ -34,58 +33,68 @@ export default function CardSelecao({
   pokemon,
   eCentro = false,
 }: Props) {
+  const corTipo =
+    CORES_TIPO[pokemon.tipos[0]?.toLowerCase()] || "#777";
+
   return (
-    <Card style={[styles.card, eCentro && styles.cardDestaque]}>
+    <Card
+      style={[
+        styles.card,
+        eCentro && styles.cardDestaque,
+      ]}
+    >
       <Card.Content style={styles.conteudo}>
 
-        {/* IMAGEM ATUAL DO POKÉMON
-            Se evoluiu, aqui aparece a imagem da evolução.
-            Exemplo:
-            Charmander → Charmeleon → Charizard
-        */}
+        {/* Imagem atual do Pokémon */}
         <View style={styles.imagemContainer}>
+          <View
+            style={[
+              styles.brilho,
+              {
+                backgroundColor: corTipo,
+              },
+            ]}
+          />
+
           <Image
             source={{ uri: pokemon.imagem }}
             style={styles.imagem}
           />
         </View>
 
-        {/* NÍVEL ATUAL */}
-        <View style={styles.nivelContainer}>
-          <Text style={styles.nivel}>
-            NÍVEL {pokemon.nivel}
-          </Text>
-        </View>
-
-        {/* NOME ATUAL
-            Se evoluiu, mostra o nome da evolução.
-            Exemplo: CHARMELEON
-        */}
+        {/* Nome atual */}
         <Text
           variant="titleMedium"
           style={styles.nome}
+          numberOfLines={1}
         >
           {pokemon.nome.toUpperCase()}
         </Text>
 
-        {/* TIPOS ATUAIS */}
-        <View style={styles.tiposContainer}>
-          {pokemon.tipos.map((tipo) => (
-            <Chip
-              key={tipo}
-              compact
-              style={[
-                styles.chip,
-                {
-                  backgroundColor:
-                    CORES_TIPO[tipo.toLowerCase()] || "#777",
-                },
-              ]}
-              textStyle={styles.chipTexto}
-            >
-              {tipo.toUpperCase()}
-            </Chip>
-          ))}
+        {/* Tipo + nível */}
+        <View style={styles.infos}>
+
+          {/* Tipo atual */}
+          <View
+            style={[
+              styles.tipoContainer,
+              {
+                backgroundColor: corTipo,
+              },
+            ]}
+          >
+            <Text style={styles.tipoTexto}>
+              TIPO: {pokemon.tipos.join(" / ").toUpperCase()}
+            </Text>
+          </View>
+
+          {/* Nível atual */}
+          <View style={styles.nivelContainer}>
+            <Text style={styles.nivel}>
+              Lv. {pokemon.nivel}
+            </Text>
+          </View>
+
         </View>
 
       </Card.Content>
@@ -94,113 +103,192 @@ export default function CardSelecao({
 }
 
 const styles = StyleSheet.create({
+
   card: {
-    width: 180,
-    minHeight: 190,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 22,
-    elevation: 7,
+    width: 190,
+    minHeight: 220,
+
+    backgroundColor: "#ffffff17",
+
+    borderRadius: 18,
+
+    borderWidth: 3,
+    borderColor: "#E6EAF2",
+
+    elevation: 8,
+
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.18,
-    shadowRadius: 6,
-    borderWidth: 2,
-    borderColor: "#E5E7EB",
+    shadowOpacity: 0.2,
+    shadowRadius: 7,
+
+    overflow: "hidden",
   },
 
+  // Destaque do card central
   cardDestaque: {
-    borderColor: "#FFDE00",
+    width: 205,
+    minHeight: 235,
+
+    borderColor: "#FFFFFF",
     borderWidth: 4,
-    elevation: 12,
-    shadowColor: "#FFDE00",
+
+    shadowColor: "#BDE7FF",
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 0,
     },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
+    shadowOpacity: 0.9,
+    shadowRadius: 25,
+
+    boxShadow:
+      "0px 0px 25px rgba(189, 231, 255, 0.9)",
+
+    transform: [
+      {
+        scale: 1.03,
+      },
+    ],
   },
 
   conteudo: {
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+
+    paddingVertical: 10,
+    paddingHorizontal: 9,
   },
 
+  // Área da imagem
   imagemContainer: {
-    width: 115,
-    height: 105,
-    borderRadius: 20,
-    backgroundColor: "#F3F6FF",
+    width: 130,
+    height: 115,
+
+    borderRadius: 18,
+
+    backgroundColor: "#EEF3FF",
+
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 6,
-    position: "relative",
+
+    marginBottom: 5,
+
+    overflow: "hidden",
+
+    borderWidth: 1,
+    borderColor: "#DCE4FF",
+  },
+
+  // Brilho da imagem
+  brilho: {
+    position: "absolute",
+
+    width: 100,
+    height: 100,
+
+    borderRadius: 50,
+
+    opacity: 0.18,
+
+    top: 8,
+    left: 15,
   },
 
   imagem: {
-    width: 100,
-    height: 100,
+    width: 160,
+    height: 160 ,
+
     resizeMode: "contain",
   },
 
-  /*
-   * NÍVEL DO POKÉMON
-   *
-   * Continua mostrando o nível atual mesmo depois
-   * da evolução.
-   *
-   * Exemplo:
-   * CHARMANDER nível 16
-   * ↓
-   * CHARMELEON nível 16
-   */
+  // Nome do Pokémon
+  nome: {
+    fontWeight: "900",
+
+    color: "#263A91",
+
+    fontSize: 18,
+
+    letterSpacing: 0.7,
+
+    marginTop: 1,
+
+    maxWidth: 165,
+
+    textAlign: "center",
+  },
+
+  // Tipo + nível
+  infos: {
+    flexDirection: "row",
+
+    alignItems: "center",
+
+    justifyContent: "center",
+
+    gap: 5,
+
+    marginTop: 4,
+
+    alignSelf: "center",
+  },
+
+  // Tipo atual
+  tipoContainer: {
+    height: 22,
+
+    paddingHorizontal: 8,
+
+    borderRadius: 6,
+
+    justifyContent: "center",
+
+    alignItems: "center",
+
+    borderWidth: 1,
+
+    borderColor: "rgba(255,255,255,0.5)",
+  },
+
+  tipoTexto: {
+    color: "#FFFFFF",
+
+    fontSize: 8,
+
+    fontWeight: "900",
+
+    letterSpacing: 0.2,
+  },
+
+  // Nível do Pokémon
   nivelContainer: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: "#3B4CCA",
-    borderRadius: 10,
+    height: 22,
+
     paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
-    elevation: 4,
+
+    borderRadius: 6,
+
+    backgroundColor: "#F5F5F5",
+
+    justifyContent: "center",
+
+    alignItems: "center",
+
+    borderWidth: 1,
+
+    borderColor: "#D0D0D0",
   },
 
   nivel: {
-    color: "#FFFFFF",
-    fontSize: 11,
+    color: "#333333",
+
+    fontSize: 9,
+
     fontWeight: "900",
+
+    letterSpacing: 0.3,
   },
 
-  nome: {
-    fontWeight: "900",
-    color: "#3B4CCA",
-    fontSize: 18,
-    letterSpacing: 0.5,
-    marginTop: 2,
-  },
-
-  tiposContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 5,
-    marginTop: 8,
-    flexWrap: "wrap",
-  },
-
-  chip: {
-    height: 28,
-    borderRadius: 14,
-  },
-
-  chipTexto: {
-    color: "#FFFFFF",
-    fontSize: 10,
-    fontWeight: "bold",
-  },
 });

@@ -220,10 +220,7 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
         ),
       },
     }
-
-    const { pokemon: atualizado, mensagem } =
-      ganharXpEChecarEvolucao(comAtributos, 100)
-
+    const { pokemon: atualizado, mensagem } = ganharXpEChecarEvolucao(comAtributos, 500)
     setPokemon(atualizado)
     setMensagemEvento(mensagem)
   }
@@ -267,16 +264,15 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
 export default Pokemon
 
 const styles = StyleSheet.create({
-  conteudo: {
-    backgroundColor: '#f5f1e8',
-    paddingTop: 16,
-    paddingBottom: 32,
-    alignItems: 'center',
+  conteudo: { 
+    backgroundColor: '#f5f1e8', 
+    paddingTop: 16, 
+    paddingBottom: 32, 
+    alignItems: 'center' 
   },
-
-  rodape: {
-    color: '#9ca3af',
-    fontSize: 12,
-    marginTop: 8,
+  rodape: { 
+    color: '#9ca3af', 
+    fontSize: 12, 
+    marginTop: 8 
   },
 })
