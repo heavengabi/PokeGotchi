@@ -126,7 +126,7 @@ const BotoesPoke = ({
         buttonColor="#2563eb"
         onPress={tocarTreinar}
       >
-        Treinar +20 EXP
+        Treinar +100 EXP
       </Button>
 
     </View>

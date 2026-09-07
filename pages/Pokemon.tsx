@@ -1,4 +1,3 @@
-
 import { ScrollView, StyleSheet, Text } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
@@ -43,7 +42,14 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
   // ficaria presa enxergando sempre o pokémon daquele momento.
   useEffect(() => {
     const intervalo = setInterval(() => {
-      setPokemon((prev) => (prev ? { ...prev, atributos: aplicarDecaimento(prev.atributos) } : prev))
+      setPokemon((prev) =>
+        prev
+          ? {
+            ...prev,
+            atributos: aplicarDecaimento(prev.atributos),
+          }
+          : prev
+      )
     }, TempoAtributos)
 
     return () => clearInterval(intervalo)
@@ -71,17 +77,19 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
         setPokemon((prev) =>
           prev
             ? {
-                ...prev,
-                speciesId: proximo.id,
-                nome: proximo.nome,
-                imagem: proximo.imagem,
-                tipos: proximo.tipos,
-                precisaEvoluir: false,
-              }
+              ...prev,
+              speciesId: proximo.id,
+              nome: proximo.nome,
+              imagem: proximo.imagem,
+              tipos: proximo.tipos,
+              precisaEvoluir: false,
+            }
             : prev
         )
 
-        setMensagemEvento(`${nomeAntigo} evoluiu para ${proximo.nome}! 🎉`)
+        setMensagemEvento(
+          `${nomeAntigo} evoluiu para ${proximo.nome}! 🎉`
+        )
       } catch (erro) {
         console.error('Erro ao evoluir pokémon', erro)
       } finally {
@@ -92,51 +100,93 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
     evoluir()
   }, [pokemon.precisaEvoluir, pokemon.speciesId, evoluindo])
 
-  // Ações do jogador (requisito 5)
+  // =====================================================
+  // AÇÕES DO JOGADOR
+  // =====================================================
+
+  // Alimentar o Pokémon
+  // Recupera a fome e dá 5 XP.
   function alimentar() {
     setMensagemEvento(null)
 
-    setPokemon({
+    const comAtributos: PokeJogo = {
       ...pokemon,
       atributos: {
         ...pokemon.atributos,
         fome: Math.min(100, pokemon.atributos.fome + 30),
       },
-    })
+    }
+
+    // Toda ação agora passa pelo sistema de XP e evolução.
+    const { pokemon: atualizado, mensagem } =
+      ganharXpEChecarEvolucao(comAtributos, 5)
+
+    setPokemon(atualizado)
+    setMensagemEvento(mensagem)
   }
 
+  // Dormir
+  // Recupera toda a energia e dá 5 XP.
   function dormir() {
     setMensagemEvento(null)
 
-    setPokemon({
+    const comAtributos: PokeJogo = {
       ...pokemon,
       atributos: {
         ...pokemon.atributos,
         energia: 100,
       },
-    })
+    }
+
+    // Toda ação agora passa pelo sistema de XP e evolução.
+    const { pokemon: atualizado, mensagem } =
+      ganharXpEChecarEvolucao(comAtributos, 5)
+
+    setPokemon(atualizado)
+    setMensagemEvento(mensagem)
   }
 
+  // Limpar / Banhar
+  // Recupera toda a higiene e dá 5 XP.
   function limpar() {
     setMensagemEvento(null)
 
-    setPokemon({
+    const comAtributos: PokeJogo = {
       ...pokemon,
       atributos: {
         ...pokemon.atributos,
         higiene: 100,
       },
-    })
+    }
+
+    // Toda ação agora passa pelo sistema de XP e evolução.
+    const { pokemon: atualizado, mensagem } =
+      ganharXpEChecarEvolucao(comAtributos, 5)
+
+    setPokemon(atualizado)
+    setMensagemEvento(mensagem)
   }
 
+  // Brincar
+  // Aumenta felicidade, gasta energia e aumenta um pouco a fome.
+  // Também dá 5 XP.
   function brincar() {
     const comAtributos: PokeJogo = {
       ...pokemon,
       atributos: {
         ...pokemon.atributos,
-        felicidade: Math.min(100, pokemon.atributos.felicidade + 20),
-        energia: Math.max(0, pokemon.atributos.energia - 10),
-        fome: Math.max(0, pokemon.atributos.fome - 5),
+        felicidade: Math.min(
+          100,
+          pokemon.atributos.felicidade + 20
+        ),
+        energia: Math.max(
+          0,
+          pokemon.atributos.energia - 10
+        ),
+        fome: Math.max(
+          0,
+          pokemon.atributos.fome - 5
+        ),
       },
     }
 
@@ -147,13 +197,21 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
     setMensagemEvento(mensagem)
   }
 
+  // Treinar
+  // Gasta energia, aumenta a fome e dá 20 XP.
   function treinar() {
     const comAtributos: PokeJogo = {
       ...pokemon,
       atributos: {
         ...pokemon.atributos,
-        energia: Math.max(0, pokemon.atributos.energia - 20),
-        fome: Math.max(0, pokemon.atributos.fome - 15),
+        energia: Math.max(
+          0,
+          pokemon.atributos.energia - 20
+        ),
+        fome: Math.max(
+          0,
+          pokemon.atributos.fome - 15
+        ),
       },
     }
 
