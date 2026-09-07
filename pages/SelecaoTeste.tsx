@@ -6,14 +6,16 @@ import {
   StyleSheet,
   Text,
   View,
+  ImageBackground
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ScreenOrientation from "expo-screen-orientation";
-
+import fundo from "../image/fundo.jpg";
 import { PokeJogo } from "../types/pokemon";
 import CardSelecao from "../components/CardSelecao";
 import { carregarPokemon } from "../utils/progressoPokemon";
 import { TABELA_EVOLUCAO } from "../data/evolucoesPoke";
+
 
 interface Props {
   onEscolher: (pokemon: PokeJogo) => void;
@@ -370,182 +372,188 @@ export default function SelecaoTeste({ onEscolher }: Props) {
   // =====================================================
 
   return (
-
-    <SafeAreaView
-      style={styles.container}
+    <ImageBackground
+      source={fundo}
+      style={styles.background}
+      resizeMode="cover"
     >
 
-      <Text style={styles.titulo}>
-        ESCOLHA SEU COMPANHEIRO
-      </Text>
-
-      <Text style={styles.subtitulo}>
-        Escolha um Pokémon para começar sua aventura
-      </Text>
-
-
-      <View
-        style={styles.cardsContainer}
+      <SafeAreaView
+        style={styles.container}
       >
 
-        {/* SETA ESQUERDA */}
+        <Text style={styles.titulo}>
+          ESCOLHA SEU COMPANHEIRO
+        </Text>
 
-        <Pressable
-          onPress={anterior}
-          style={({ pressed }) => [
-            styles.seta,
-            styles.setaEsquerda,
-            pressed &&
-            styles.setaPressionada,
-          ]}
-          hitSlop={12}
-        >
+        <Text style={styles.subtitulo}>
+          Escolha um Pokémon para começar sua aventura
+        </Text>
 
-          <Text
-            style={styles.setaTexto}
-          >
-            ‹
-          </Text>
-
-        </Pressable>
-
-
-        {/* CARDS */}
-
-        {cardsVisiveis.map(
-          (item) => {
-
-            const eCentro =
-              item.posicao === "centro";
-
-            return (
-
-              <Pressable
-                key={`${item.pokemon.speciesId}-${item.posicao}`}
-                onPress={() =>
-                  selecionar(
-                    item.indexOriginal
-                  )
-                }
-                style={[
-                  styles.cardWrapper,
-                  {
-                    width:
-                      larguraCard,
-                  },
-                  eCentro
-                    ? styles.cardCentro
-                    : styles.cardLateral,
-                ]}
-              >
-
-                <CardSelecao
-                  pokemon={
-                    item.pokemon
-                  }
-                  eCentro={
-                    eCentro
-                  }
-                />
-
-              </Pressable>
-
-            );
-          }
-        )}
-
-
-        {/* SETA DIREITA */}
-
-        <Pressable
-          onPress={proximo}
-          style={({ pressed }) => [
-            styles.seta,
-            styles.setaDireita,
-            pressed &&
-            styles.setaPressionada,
-          ]}
-          hitSlop={12}
-        >
-
-          <Text
-            style={styles.setaTexto}
-          >
-            ›
-          </Text>
-
-        </Pressable>
-
-      </View>
-
-
-      {/* =====================================================
-          CONTROLES
-          ===================================================== */}
-
-      <View
-        style={styles.controles}
-      >
 
         <View
-          style={styles.bolinhas}
+          style={styles.cardsContainer}
         >
 
-          {pokemons.map(
-            (pokemon, index) => (
+          {/* SETA ESQUERDA */}
 
-              <Pressable
-                key={`${pokemon.speciesId}-${index}`}
-                onPress={() =>
-                  selecionar(index)
-                }
-                style={[
-                  styles.bolinha,
-                  index ===
-                  indiceSelecionado &&
-                  styles.bolinhaSelecionada,
-                ]}
-                hitSlop={8}
-              />
+          <Pressable
+            onPress={anterior}
+            style={({ pressed }) => [
+              styles.seta,
+              styles.setaEsquerda,
+              pressed &&
+              styles.setaPressionada,
+            ]}
+            hitSlop={12}
+          >
 
-            )
+            <Text
+              style={styles.setaTexto}
+            >
+              ‹
+            </Text>
+
+          </Pressable>
+
+
+          {/* CARDS */}
+
+          {cardsVisiveis.map(
+            (item) => {
+
+              const eCentro =
+                item.posicao === "centro";
+
+              return (
+
+                <Pressable
+                  key={`${item.pokemon.speciesId}-${item.posicao}`}
+                  onPress={() =>
+                    selecionar(
+                      item.indexOriginal
+                    )
+                  }
+                  style={[
+                    styles.cardWrapper,
+                    {
+                      width:
+                        larguraCard,
+                    },
+                    eCentro
+                      ? styles.cardCentro
+                      : styles.cardLateral,
+                  ]}
+                >
+
+                  <CardSelecao
+                    pokemon={
+                      item.pokemon
+                    }
+                    eCentro={
+                      eCentro
+                    }
+                  />
+
+                </Pressable>
+              );
+            }
           )}
+
+
+          {/* SETA DIREITA */}
+
+          <Pressable
+            onPress={proximo}
+            style={({ pressed }) => [
+              styles.seta,
+              styles.setaDireita,
+              pressed &&
+              styles.setaPressionada,
+            ]}
+            hitSlop={12}
+          >
+
+            <Text
+              style={styles.setaTexto}
+            >
+              ›
+            </Text>
+
+          </Pressable>
 
         </View>
 
 
-        {/* BOTÃO ESCOLHER */}
+        {/* =====================================================
+          CONTROLES
+          ===================================================== */}
 
-        <Pressable
-          style={({ pressed }) => [
-            styles.botao,
-            pressed &&
-            styles.botaoPressionado,
-          ]}
-          onPress={() =>
-            onEscolher(
-              pokemonSelecionado
-            )
-          }
+        <View
+          style={styles.controles}
         >
 
-          <Text
-            style={styles.textoBotao}
+          <View
+            style={styles.bolinhas}
           >
-            ESCOLHER
-          </Text>
 
-          <Text
-            style={styles.setaBotao}
+            {pokemons.map(
+              (pokemon, index) => (
+
+                <Pressable
+                  key={`${pokemon.speciesId}-${index}`}
+                  onPress={() =>
+                    selecionar(index)
+                  }
+                  style={[
+                    styles.bolinha,
+                    index ===
+                    indiceSelecionado &&
+                    styles.bolinhaSelecionada,
+                  ]}
+                  hitSlop={8}
+                />
+
+              )
+            )}
+
+          </View>
+
+
+          {/* BOTÃO ESCOLHER */}
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.botao,
+              pressed &&
+              styles.botaoPressionado,
+            ]}
+            onPress={() =>
+              onEscolher(
+                pokemonSelecionado
+              )
+            }
           >
-            →
-          </Text>
 
-        </Pressable>
+            <Text
+              style={styles.textoBotao}
+            >
+              ESCOLHER
+            </Text>
 
-      </View>
+            <Text
+              style={styles.setaBotao}
+            >
+              →
+            </Text>
 
-    </SafeAreaView>
+          </Pressable>
+
+        </View>
+
+      </SafeAreaView>
+
+    </ImageBackground>
   );
 }
 
@@ -556,9 +564,14 @@ export default function SelecaoTeste({ onEscolher }: Props) {
 
 const styles = StyleSheet.create({
 
+  background: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+
   container: {
     flex: 1,
-    backgroundColor: "#7BC043",
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 10,
@@ -725,4 +738,3 @@ const styles = StyleSheet.create({
   },
 
 });
-
