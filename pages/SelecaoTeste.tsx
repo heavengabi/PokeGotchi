@@ -23,13 +23,21 @@ export default function SelecaoInicial({ onEscolher }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.texto}>Stub temporário — sua colega substitui isso</Text>
+      <Text style={styles.texto}>Substituir pela tela principal</Text>
       <Button title="Escolher Charmander (teste)" onPress={escolherCharmander} />
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12 },
-  texto: { textAlign: 'center', paddingHorizontal: 20 },
+  container: { 
+    flex: 1,
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    gap: 12 
+  },
+  texto: { 
+    textAlign: 'center', 
+    paddingHorizontal: 20 
+  },
 })
