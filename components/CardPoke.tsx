@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, Image, ImageBackground } from 'react-native'
 import { ProgressBar } from 'react-native-paper'
+import { LinearGradient } from 'expo-linear-gradient'
 import React from 'react'
 import { PokeJogo } from '../types/pokemon'
 
@@ -39,7 +40,10 @@ const CardPoke = ({ pokemon, mensagemStatus }: Props) => {
         </View>
       </ImageBackground>
 
-      <View style={styles.infoCard}>
+      <LinearGradient
+        colors={['rgb(253, 230, 138)', 'rgb(245, 158, 11)']}
+        style={styles.infoCard}
+      >
         <View style={styles.linhaTopo}>
           <View>
             <Text style={styles.nome}>{pokemon.nome}</Text>
@@ -55,7 +59,7 @@ const CardPoke = ({ pokemon, mensagemStatus }: Props) => {
           <Text style={styles.textoExp}>{pokemon.experiencia}/{pokemon.experienciaProximoNivel} EXP</Text>
         </View>
         <ProgressBar progress={progressoExp} color="#3b82f6" style={styles.barraExp} />
-      </View>
+      </LinearGradient>
     </View>
   )
 }
@@ -73,8 +77,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   imagemMoldura: {
-    width: "100%",
-    height: "auto",
+    width: '100%',
+    height: 'auto',
     borderRadius: 24,
   },
   tela: {
@@ -83,7 +87,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   imagemPokemon: {
-    width: 180,
+    width: 140,
     height: 200,
   },
   bolhaFala: {
@@ -100,7 +104,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   infoCard: {
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
     marginTop: 12,

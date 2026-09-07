@@ -11,7 +11,7 @@ export default function SelecaoInicial({ onEscolher }: Props) {
     onEscolher({
       speciesId: 4,
       nome: 'charmander',
-      imagem: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png',
+      imagem: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/4.gif',
       tipos: ['fire'],
       nivel: 1,
       experiencia: 0,

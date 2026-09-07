@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text } from 'react-native'
+import { ScrollView, StyleSheet, Text, ImageBackground } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import CardPoke from '../components/CardPoke'
@@ -11,7 +11,7 @@ import { aplicarDecaimento, obterMensagemStatus, podeTreinar } from '../utils/at
 import { ganharXpEChecarEvolucao } from '../utils/pokejogo'
 import BotoesPoke from '../components/BotoesPoke'
 
-const TempoAtributos = 5000 // passagem do tempo: atributos caem a cada 5s
+const TempoAtributos = 5000
 
 interface Props {
   pokemon: PokeJogo
@@ -23,10 +23,6 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
   const [mensagemEvento, setMensagemEvento] = useState<string | null>(null)
   const [evoluindo, setEvoluindo] = useState(false)
 
-  // Passagem do tempo (requisito 4): a cada 5s os atributos decaem.
-  // Usa a forma funcional do setState (prev => ...) porque a função do
-  // setInterval é criada uma vez só no primeiro render e, sem isso,
-  // ficaria presa enxergando sempre o pokémon daquele momento.
   useEffect(() => {
     const intervalo = setInterval(() => {
       setPokemon((prev) => (prev ? { ...prev, atributos: aplicarDecaimento(prev.atributos) } : prev))
@@ -34,11 +30,6 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
     return () => clearInterval(intervalo)
   }, [setPokemon])
 
-  // Sistema de evolução (requisito 8): observa a flag "precisaEvoluir"
-  // (definida em ganharXpEChecarEvolucao quando o nível bate o necessário)
-  // e busca o próximo estágio na PokéAPI quando ela fica true.
-  // "evoluindo" evita disparar duas buscas em paralelo caso o efeito rode
-  // de novo antes da primeira terminar.
   useEffect(() => {
     if (!pokemon.precisaEvoluir || evoluindo) return
 
@@ -71,7 +62,6 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
     evoluir()
   }, [pokemon.precisaEvoluir, pokemon.speciesId, evoluindo])
 
-  // Ações do jogador (requisito 5)
   function alimentar() {
     setMensagemEvento(null)
     setPokemon({ ...pokemon, atributos: { ...pokemon.atributos, fome: Math.min(100, pokemon.atributos.fome + 30) } })
@@ -102,9 +92,6 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
     setMensagemEvento(mensagem)
   }
 
-  // Trava: só treina se ainda tiver fome e energia acima de zero.
-  // Sem essa checagem, o jogador conseguia treinar infinitamente mesmo
-  // com o pokémon sem energia/comida nenhuma, o que não faz sentido no jogo.
   function treinar() {
     if (!podeTreinar(pokemon.atributos)) {
       setMensagemEvento('Sem energia ou fome suficiente pra treinar!')
@@ -127,7 +114,11 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
   const mensagemStatus = obterMensagemStatus(pokemon.atributos)
 
   return (
-    <>
+    <ImageBackground
+      source={require('../image/fundo.jpg')}
+      style={styles.fundo}
+      resizeMode="stretch"
+    >
       <Navbar Trocar={Trocar} />
       <ScrollView contentContainerStyle={styles.conteudo}>
         <CardPoke pokemon={pokemon} mensagemStatus={mensagemStatus} />
@@ -146,22 +137,26 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
           Treinar={treinar}
         />
       </ScrollView>
-    </>
+    </ImageBackground>
   )
 }
 
 export default Pokemon
 
 const styles = StyleSheet.create({
-  conteudo: { 
-    backgroundColor: '#f5f1e8', 
-    paddingTop: 16, 
-    paddingBottom: 32, 
-    alignItems: 'center' 
+  fundo: {
+    flex: 1,
+    height: "100%",
+    width: '100%'
   },
-  rodape: { 
-    color: '#9ca3af', 
-    fontSize: 12, 
-    marginTop: 8 
+  conteudo: {
+    paddingTop: 16,
+    paddingBottom: 32,
+    alignItems: 'center',
+  },
+  rodape: {
+    color: '#9ca3af',
+    fontSize: 12,
+    marginTop: 8,
   },
 })

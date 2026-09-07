@@ -14,11 +14,16 @@ export async function buscarDetalhePokemon(idOuNome: number | string): Promise<D
     throw new Error(`Pokémon ${idOuNome} não encontrado (status ${resposta.status})`)
   }
   const dados = await resposta.json()
+
+  // Nem todo pokémon tem gif animado (só até a geração 5, ids até 649).
+  // Se não existir, cai pro sprite estático como reserva.
+  const gifAnimado = dados.sprites?.versions?.['generation-v']?.['black-white']?.animated?.front_default
+  const imagemFinal = gifAnimado ?? dados.sprites.front_default
+
   return {
     id: dados.id,
     nome: dados.name,
-    imagem: dados.sprites.front_default,
+    imagem: imagemFinal,
     tipos: dados.types.map((t: any) => t.type.name),
-    // a API retorna altura em decímetros e peso em hectogramas
   }
 }
