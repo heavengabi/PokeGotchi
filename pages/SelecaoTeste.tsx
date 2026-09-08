@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ScreenOrientation from "expo-screen-orientation";
 
@@ -30,6 +36,7 @@ const pokemonsIniciais: PokeJogo[] = [
     },
     precisaEvoluir: false,
   },
+
   {
     speciesId: 7,
     nome: "squirtle",
@@ -47,6 +54,7 @@ const pokemonsIniciais: PokeJogo[] = [
     },
     precisaEvoluir: false,
   },
+
   {
     speciesId: 1,
     nome: "bulbasaur",
@@ -64,6 +72,7 @@ const pokemonsIniciais: PokeJogo[] = [
     },
     precisaEvoluir: false,
   },
+
   {
     speciesId: 158,
     nome: "totodile",
@@ -85,43 +94,52 @@ const pokemonsIniciais: PokeJogo[] = [
 
 export default function SelecaoTeste({ onEscolher }: Props) {
   const [pokemons, setPokemons] = useState<PokeJogo[]>(pokemonsIniciais);
-  const [indiceSelecionado, setIndiceSelecionado] = useState(0);
 
+  // CARREGAR PROGRESSO
   useEffect(() => {
+    // Função responsável por carregar o progresso dos Pokémons salvos
     async function carregarProgresso() {
       try {
+        // Carrega todos os Pokémons iniciais ao mesmo tempo
         const pokemonsSalvos = await Promise.all(
           pokemonsIniciais.map(async (pokemonInicial) => {
+            // Tenta carregar o Pokémon inicial salvo
             let pokemonAtual = await carregarPokemon(pokemonInicial.speciesId);
+            // Começa verificando a evolução a partir do Pokémon inicial
             let idAtual = pokemonInicial.speciesId;
-
-            while (TABELA_EVOLUCAO[idAtual]) {
+            // Continua verificando se o Pokémon possui evolução
+            while (true) {
+              // Pega a regra de evolução desse Pokémon
               const regra = TABELA_EVOLUCAO[idAtual];
-              if (!regra) break;
-
-              const pokemonEvoluido = await carregarPokemon(regra.proximoId);
-
-              if (pokemonEvoluido) {
-                pokemonAtual = pokemonEvoluido;
-                idAtual = regra.proximoId;
-              } else {
+              // Se não tiver evolução, para
+              if (!regra) {
                 break;
               }
+              // Tenta carregar o Pokémon evoluído
+              const pokemonEvoluido = await carregarPokemon(regra.proximoId);
+              // Se a evolução não estiver salva, para
+              if (!pokemonEvoluido) {
+                break;
+              }
+              // Atualiza para o Pokémon evoluído
+              pokemonAtual = pokemonEvoluido;
+              idAtual = regra.proximoId;
             }
-
-            return pokemonAtual ?? pokemonInicial;
-          })
+            // Retorna o Pokémon mais evoluído salvo
+            // Se não tiver nenhum salvo, usa o Pokémon inicial
+            return pokemonAtual || pokemonInicial;
+          }),
         );
-
+        // Atualiza a lista de Pokémons na tela
         setPokemons(pokemonsSalvos);
       } catch (erro) {
-        console.error("Erro ao carregar progresso dos Pokémon:", erro);
+        // Mostra o erro caso aconteça algum problema
+        console.error("Erro ao carregar progresso:", erro);
       }
     }
-
+    // Executa a função quando a tela é carregada
     carregarProgresso();
   }, []);
-
   // LANDSCAPE
   useEffect(() => {
     ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
@@ -131,96 +149,28 @@ export default function SelecaoTeste({ onEscolher }: Props) {
     };
   }, []);
 
-  // CONTROLES DOS CARDS
-  const total = pokemons.length;
-
-  const selecionar = (index: number) => {
-    setIndiceSelecionado(index);
-  };
-
-  const idxAnterior = (indiceSelecionado - 1 + total) % total;
-  const idxProximo = (indiceSelecionado + 1) % total;
-
-  const cardsVisiveis = [
-    {
-      pokemon: pokemons[idxAnterior],
-      indexOriginal: idxAnterior,
-      posicao: "esquerda",
-    },
-    {
-      pokemon: pokemons[indiceSelecionado],
-      indexOriginal: indiceSelecionado,
-      posicao: "centro",
-    },
-    {
-      pokemon: pokemons[idxProximo],
-      indexOriginal: idxProximo,
-      posicao: "direita",
-    },
-  ];
-
-  const pokemonSelecionado = pokemons[indiceSelecionado];
-
   return (
     <ImageBackground
-      source={require("../assets/fundo.jpg")}
+      source={require("../image/fundo.jpg")}
       style={styles.backgroundImage}
       resizeMode="cover"
     >
       <SafeAreaView style={styles.container}>
         <Text style={styles.titulo}>ESCOLHA SEU COMPANHEIRO</Text>
 
-        <Text style={styles.subtitulo}>
-          Escolha um Pokémon para começar sua aventura
-        </Text>
-
         <View style={styles.cardsContainer}>
-          {/* CARDS */}
-          {cardsVisiveis.map((item) => {
-            const eCentro = item.posicao === "centro";
-
-            return (
-              <Pressable
-                key={`${item.pokemon.speciesId}-${item.posicao}`}
-                onPress={() => selecionar(item.indexOriginal)}
-                style={[
-                  styles.cardWrapper,
-                  eCentro ? styles.cardCentro : styles.cardLateral,
-                ]}
-              >
-                <CardSelecao pokemon={item.pokemon} eCentro={eCentro} />
-              </Pressable>
-            );
-          })}
-        </View>
-
-        {/* CONTROLES */}
-        <View style={styles.controles}>
-          <View style={styles.bolinhas}>
-            {pokemons.map((pokemon, index) => (
-              <Pressable
-                key={`${pokemon.speciesId}-${index}`}
-                onPress={() => selecionar(index)}
-                style={[
-                  styles.bolinha,
-                  index === indiceSelecionado && styles.bolinhaSelecionada,
-                ]}
-                hitSlop={8}
-              />
-            ))}
-          </View>
-
-          {/* BOTÃO ESCOLHER */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.botao,
-              pressed && styles.botaoPressionado,
-            ]}
-            onPress={() => onEscolher(pokemonSelecionado)}
-          >
-            <Text style={styles.textoBotao}>ESCOLHER</Text>
-            <Text style={styles.setaBotao}>→</Text>
-          </Pressable>
+          {pokemons.map((pokemon) => (
+            <Pressable
+              key={pokemon.speciesId}
+              onPress={() => onEscolher(pokemon)}
+              style={({ pressed }) => [
+                styles.cardWrapper,
+                pressed && styles.cardPressionado,
+              ]}
+            >
+              <CardSelecao pokemon={pokemon} />
+            </Pressable>
+          ))}
         </View>
       </SafeAreaView>
     </ImageBackground>
@@ -286,80 +236,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  cardCentro: {
-    transform: [{ scale: 1.05 }],
-    zIndex: 10,
-    elevation: 10,
-  },
-
-  cardLateral: {
-    transform: [{ scale: 0.82 }],
-    zIndex: 1,
-    opacity: 0.85,
-    elevation: 2,
-  },
-
-  controles: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    marginTop: 2,
-  },
-
-  bolinhas: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 9,
-  },
-
-  bolinha: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: "rgba(255,255,255,0.45)",
-  },
-
-  bolinhaSelecionada: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: "#FFD447",
-    borderWidth: 2,
-    borderColor: "#FFFFFF",
-    elevation: 3,
-  },
-
-  botao: {
-    minWidth: 180,
-    height: 38,
-    paddingHorizontal: 22,
-    borderRadius: 20,
-    backgroundColor: "#1689D5",
-    borderWidth: 2,
-    borderColor: "#075C91",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    elevation: 5,
-  },
-
-  botaoPressionado: {
+  cardPressionado: {
     transform: [{ scale: 0.95 }],
-    opacity: 0.9,
-  },
-
-  textoBotao: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "900",
-    letterSpacing: 0.8,
-  },
-
-  setaBotao: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "900",
+    opacity: 0.85,
   },
 });

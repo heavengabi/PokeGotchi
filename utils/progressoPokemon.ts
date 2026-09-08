@@ -1,34 +1,42 @@
-    import AsyncStorage from '@react-native-async-storage/async-storage'
-    import { PokeJogo } from '../types/pokemon'
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { PokeJogo } from "../types/pokemon";
 
-    const criarChave = (id: number) => `pokemon_${id}`
+// Cria uma chave única para cada Pokémon
+const criarChave = (id: number) => `pokemon_${id}`;
 
-    export async function salvarPokemon(pokemon: PokeJogo) {
-        try {
-            await AsyncStorage.setItem(
-                criarChave(pokemon.speciesId),
-                JSON.stringify(pokemon)
-            )
-        } catch (erro) {
-            console.error('Erro ao salvar Pokémon:', erro)
-        }
+// Salva um Pokémon no AsyncStorage
+export async function salvarPokemon(pokemon: PokeJogo) {
+  try {
+    // Salva o Pokémon usando o speciesId como identificador
+    // JSON.stringify transforma o objeto em texto para poder salvar
+    await AsyncStorage.setItem(
+      criarChave(pokemon.speciesId),
+      JSON.stringify(pokemon),
+    );
+  } catch (erro) {
+    // Mostra o erro caso não consiga salvar
+    console.error("Erro ao salvar Pokémon:", erro);
+  }
+}
+
+// Carrega um Pokémon salvo pelo seu ID
+export async function carregarPokemon(id: number): Promise<PokeJogo | null> {
+  try {
+    // Procura no AsyncStorage o Pokémon usando sua chave
+    const dados = await AsyncStorage.getItem(criarChave(id));
+
+    // Se não encontrar nada, retorna null
+    if (!dados) {
+      return null;
     }
 
-    export async function carregarPokemon(
-        id: number
-    ): Promise<PokeJogo | null> {
-        try {
-            const dados = await AsyncStorage.getItem(
-                criarChave(id)
-            )
+    // JSON.parse transforma o texto novamente em objeto
+    return JSON.parse(dados);
+  } catch (erro) {
+    // Mostra o erro caso não consiga carregar
+    console.error("Erro ao carregar Pokémon:", erro);
 
-            if (!dados) {
-                return null
-            }
-
-            return JSON.parse(dados)
-        } catch (erro) {
-            console.error('Erro ao carregar Pokémon:', erro)
-            return null
-        }
-    }
+    // Retorna null se acontecer algum erro
+    return null;
+  }
+}

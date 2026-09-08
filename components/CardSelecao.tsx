@@ -7,7 +7,6 @@ import { PokeJogo } from "../types/pokemon";
 
 interface Props {
   pokemon: PokeJogo;
-  eCentro?: boolean;
 }
 
 const CORES_TIPO: Record<string, string> = {
@@ -31,14 +30,14 @@ const CORES_TIPO: Record<string, string> = {
   fairy: "#EE99AC",
 };
 
-export default function CardSelecao({ pokemon, eCentro = false }: Props) {
+export default function CardSelecao({ pokemon }: Props) {
   const tipo = pokemon.tipos[0].toLowerCase();
   const corTipo = CORES_TIPO[tipo] ?? "#777";
 
   return (
-    <Card style={[styles.card, eCentro && styles.cardCentro]} mode="contained">
+    <Card style={styles.card} mode="contained">
       <Card.Content style={styles.conteudo}>
-        {/* Topo: Número, Nome e Nível */}
+        {/* Número, nome e nível */}
         <View style={styles.topo}>
           <Text style={styles.numero}>
             #{String(pokemon.speciesId).padStart(3, "0")}
@@ -68,6 +67,7 @@ export default function CardSelecao({ pokemon, eCentro = false }: Props) {
         {/* Experiência */}
         <View style={styles.experiencia}>
           <Text style={styles.expTexto}>EXP</Text>
+
           <Text style={styles.expValor}>
             {pokemon.experiencia}/{pokemon.experienciaProximoNivel}
           </Text>
@@ -90,17 +90,11 @@ const styles = StyleSheet.create({
   card: {
     width: 170,
     height: 205,
-    backgroundColor: "rgba(0, 0, 0, 0.45)", // Fundo preto semi-transparente
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: "rgba(255, 255, 255, 0.2)", // Borda sutil translúcida
+    borderColor: "rgba(255, 255, 255, 0.2)",
     overflow: "hidden",
-  },
-
-  cardCentro: {
-    backgroundColor: "rgba(0, 0, 0, 0.65)", // Ligeiramente mais escuro para destaque
-    borderColor: "#FFD447", // Borda amarelada para o card ativo
-    borderWidth: 2,
   },
 
   conteudo: {
