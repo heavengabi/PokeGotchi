@@ -1,29 +1,19 @@
-import {
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import { ScrollView, StyleSheet, Text, ImageBackground } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import Navbar from '../components/Navbar'
+import CardPoke from '../components/CardPoke'
+import Atributos from '../components/Atributos'
+import Evento from '../components/Evento'
+import { PokeJogo } from '../types/pokemon'
+import { TABELA_EVOLUCAO } from '../data/evolucoesPoke'
+import { buscarDetalhePokemon } from '../services/pokeAPI'
+import { aplicarDecaimento, obterMensagemStatus, podeTreinar } from '../utils/atributos'
+import { ganharXpEChecarEvolucao } from '../utils/pokejogo'
+import BotoesPoke from '../components/BotoesPoke'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { salvarPokemon } from '../utils/progressoPokemon'
 
-import React, { useEffect, useState } from 'react';
-
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-import Navbar from '../components/Navbar';
-import CardPoke from '../components/CardPoke';
-import Atributos from '../components/Atributos';
-import Evento from '../components/Evento';
-import { PokeJogo } from '../types/pokemon';
-import { TABELA_EVOLUCAO } from '../data/evolucoesPoke';
-import { buscarDetalhePokemon } from '../services/pokeAPI';
-import {
-  aplicarDecaimento,
-  obterMensagemStatus,
-  podeTreinar,
-} from '../utils/atributos';
-import { ganharXpEChecarEvolucao } from '../utils/pokejogo';
-import { salvarPokemon } from '../utils/progressoPokemon';
-import BotoesPoke from '../components/BotoesPoke';
-
-const TempoAtributos = 5000;
+const TempoAtributos = 5000
 
 interface Props {
   pokemon: PokeJogo;

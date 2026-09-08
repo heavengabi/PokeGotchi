@@ -21,12 +21,15 @@ export async function buscarDetalhePokemon(
 
   const dados = await resposta.json()
 
+  // Nem todo pokémon tem gif animado (só até a geração 5, ids até 649).
+  // Se não existir, cai pro sprite estático como reserva.
+  const gifAnimado = dados.sprites?.versions?.['generation-v']?.['black-white']?.animated?.front_default
+  const imagemFinal = gifAnimado ?? dados.sprites.front_default
+
   return {
     id: dados.id,
     nome: dados.name,
-    imagem:
-      dados.sprites.versions['generation-v']['black-white'].animated
-        .front_default,
+    imagem: imagemFinal,
     tipos: dados.types.map((t: any) => t.type.name),
   }
 }

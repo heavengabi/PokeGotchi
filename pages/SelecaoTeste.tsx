@@ -1,30 +1,24 @@
-import React, { useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  Pressable,
-  ScrollView,
-  ImageBackground,
-  View,
-} from "react-native";
-import * as ScreenOrientation from "expo-screen-orientation";
+import React, { useEffect, useState } from "react";
+import { ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as ScreenOrientation from "expo-screen-orientation";
 
-import CardSelecao from "../components/CardSelecao";
 import { PokeJogo } from "../types/pokemon";
+import CardSelecao from "../components/CardSelecao";
+import { carregarPokemon } from "../utils/progressoPokemon";
+import { TABELA_EVOLUCAO } from "../data/evolucoesPoke";
 
 interface Props {
   onEscolher: (pokemon: PokeJogo) => void;
 }
 
-// ARRAY DE DADOS: As URLs das imagens foram trocadas de '.png' para '.gif'
-// apontando para o diretório 'animated' da Generation V na PokeAPI.
-const pokemons: PokeJogo[] = [
+const pokemonsIniciais: PokeJogo[] = [
   {
     speciesId: 4,
-    nome: "Charmander",
+    nome: "charmander",
     imagem:
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/4.gif",
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+    tipos: ["fire"],
     nivel: 1,
     experiencia: 0,
     experienciaProximoNivel: 100,
@@ -35,13 +29,13 @@ const pokemons: PokeJogo[] = [
       higiene: 80,
     },
     precisaEvoluir: false,
-    tipos: ["Fire"],
   },
   {
     speciesId: 7,
-    nome: "Squirtle",
+    nome: "squirtle",
     imagem:
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/7.gif",
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+    tipos: ["water"],
     nivel: 1,
     experiencia: 0,
     experienciaProximoNivel: 100,
@@ -52,13 +46,13 @@ const pokemons: PokeJogo[] = [
       higiene: 80,
     },
     precisaEvoluir: false,
-    tipos: ["Water"],
   },
   {
     speciesId: 1,
-    nome: "Bulbasaur",
+    nome: "bulbasaur",
     imagem:
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/1.gif",
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+    tipos: ["grass", "poison"],
     nivel: 1,
     experiencia: 0,
     experienciaProximoNivel: 100,
@@ -69,13 +63,13 @@ const pokemons: PokeJogo[] = [
       higiene: 80,
     },
     precisaEvoluir: false,
-    tipos: ["Grass", "Poison"],
   },
   {
     speciesId: 158,
-    nome: "Totodile",
+    nome: "totodile",
     imagem:
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/158.gif",
+      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/158.png",
+    tipos: ["water"],
     nivel: 1,
     experiencia: 0,
     experienciaProximoNivel: 100,
@@ -86,73 +80,149 @@ const pokemons: PokeJogo[] = [
       higiene: 80,
     },
     precisaEvoluir: false,
-    tipos: ["Water"],
   },
 ];
 
 export default function SelecaoTeste({ onEscolher }: Props) {
-  /*
-   * GERENCIAMENTO DA TELA (Giro automático):
-   * Quando o componente monta, trava o celular na horizontal (LANDSCAPE).
-   * A função no 'return' limpa a trava quando saímos desta tela,
-   * liberando a rotação de volta ao normal (unlockAsync).
-   */
+  const [pokemons, setPokemons] = useState<PokeJogo[]>(pokemonsIniciais);
+  const [indiceSelecionado, setIndiceSelecionado] = useState(0);
+
   useEffect(() => {
-    ScreenOrientation.lockAsync(
-      ScreenOrientation.OrientationLock.LANDSCAPE
-    );
+    async function carregarProgresso() {
+      try {
+        const pokemonsSalvos = await Promise.all(
+          pokemonsIniciais.map(async (pokemonInicial) => {
+            let pokemonAtual = await carregarPokemon(pokemonInicial.speciesId);
+            let idAtual = pokemonInicial.speciesId;
+
+            while (TABELA_EVOLUCAO[idAtual]) {
+              const regra = TABELA_EVOLUCAO[idAtual];
+              if (!regra) break;
+
+              const pokemonEvoluido = await carregarPokemon(regra.proximoId);
+
+              if (pokemonEvoluido) {
+                pokemonAtual = pokemonEvoluido;
+                idAtual = regra.proximoId;
+              } else {
+                break;
+              }
+            }
+
+            return pokemonAtual ?? pokemonInicial;
+          })
+        );
+
+        setPokemons(pokemonsSalvos);
+      } catch (erro) {
+        console.error("Erro ao carregar progresso dos Pokémon:", erro);
+      }
+    }
+
+    carregarProgresso();
+  }, []);
+
+  // LANDSCAPE
+  useEffect(() => {
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
     return () => {
-      ScreenOrientation.unlockAsync();
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
     };
   }, []);
 
+  // CONTROLES DOS CARDS
+  const total = pokemons.length;
+
+  const selecionar = (index: number) => {
+    setIndiceSelecionado(index);
+  };
+
+  const idxAnterior = (indiceSelecionado - 1 + total) % total;
+  const idxProximo = (indiceSelecionado + 1) % total;
+
+  const cardsVisiveis = [
+    {
+      pokemon: pokemons[idxAnterior],
+      indexOriginal: idxAnterior,
+      posicao: "esquerda",
+    },
+    {
+      pokemon: pokemons[indiceSelecionado],
+      indexOriginal: indiceSelecionado,
+      posicao: "centro",
+    },
+    {
+      pokemon: pokemons[idxProximo],
+      indexOriginal: idxProximo,
+      posicao: "direita",
+    },
+  ];
+
+  const pokemonSelecionado = pokemons[indiceSelecionado];
+
   return (
     <ImageBackground
-      source={require("../image/fundo.jpg")}
+      source={require("../assets/fundo.jpg")}
       style={styles.backgroundImage}
       resizeMode="cover"
     >
-      {/* Overlay transparente para garantir a leitura do texto sobre o fundo */}
-      <View style={styles.overlay}>
-        {/* 
-         * 'edges': Garante que o conteúdo não fique debaixo da câmera 
-         * ou da barra de navegação nos 4 lados, essencial em telas deitadas.
-         */}
-        <SafeAreaView style={styles.container} edges={["top", "bottom", "left", "right"]}>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.titulo}>ESCOLHA SEU COMPANHEIRO</Text>
 
-          <Text style={styles.titulo}>ESCOLHA SEU POKÉMON!</Text>
+        <Text style={styles.subtitulo}>
+          Escolha um Pokémon para começar sua aventura
+        </Text>
 
-          {/* 
-            contentContainerStyle: Aplica os estilos ao CONTEÚDO interno 
-            da lista, e não na caixa visível da ScrollView em si.
-          */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.listaHorizontal}
-          >
-            {pokemons.map((pokemon) => (
-              /*
-               * PRESSABLE COM ESTILO DINÂMICO:
-               * Aplica 'styles.pressionado' somente enquanto 'pressed' for true,
-               * dando feedback visual de clique (efeito afundar).
-               */
+        <View style={styles.cardsContainer}>
+          {/* CARDS */}
+          {cardsVisiveis.map((item) => {
+            const eCentro = item.posicao === "centro";
+
+            return (
               <Pressable
-                key={pokemon.speciesId}
-                onPress={() => onEscolher(pokemon)}
-                style={({ pressed }) => [
-                  styles.botao,
-                  pressed && styles.pressionado,
+                key={`${item.pokemon.speciesId}-${item.posicao}`}
+                onPress={() => selecionar(item.indexOriginal)}
+                style={[
+                  styles.cardWrapper,
+                  eCentro ? styles.cardCentro : styles.cardLateral,
                 ]}
               >
-                <CardSelecao pokemon={pokemon} />
+                <CardSelecao pokemon={item.pokemon} eCentro={eCentro} />
               </Pressable>
-            ))}
-          </ScrollView>
+            );
+          })}
+        </View>
 
-        </SafeAreaView>
-      </View>
+        {/* CONTROLES */}
+        <View style={styles.controles}>
+          <View style={styles.bolinhas}>
+            {pokemons.map((pokemon, index) => (
+              <Pressable
+                key={`${pokemon.speciesId}-${index}`}
+                onPress={() => selecionar(index)}
+                style={[
+                  styles.bolinha,
+                  index === indiceSelecionado && styles.bolinhaSelecionada,
+                ]}
+                hitSlop={8}
+              />
+            ))}
+          </View>
+
+          {/* BOTÃO ESCOLHER */}
+          <Pressable
+            style={({ pressed }) => [
+              styles.botao,
+              pressed && styles.botaoPressionado,
+            ]}
+            onPress={() => onEscolher(pokemonSelecionado)}
+          >
+            <Text style={styles.textoBotao}>ESCOLHER</Text>
+            <Text style={styles.setaBotao}>→</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
     </ImageBackground>
   );
 }
@@ -163,48 +233,133 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.35)",
-  },
+
   container: {
     flex: 1,
-    justifyContent: "space-between",
+    backgroundColor: "transparent",
     alignItems: "center",
-    paddingVertical: 10,
+    justifyContent: "space-between",
+    paddingTop: 10,
+    paddingBottom: 12,
+    paddingHorizontal: 20,
   },
+
   titulo: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "900",
     color: "#FFFFFF",
-    textAlign: "center",
-    textTransform: "uppercase",
     letterSpacing: 1.2,
-    marginTop: 8,
-    textShadowColor: "rgba(0, 0, 0, 0.75)",
-    textShadowOffset: { width: 1, height: 2 },
-    textShadowRadius: 3,
+    textShadowColor: "rgba(0, 0, 0, 0.6)",
+    textShadowOffset: {
+      width: 1,
+      height: 2,
+    },
+    textShadowRadius: 4,
   },
-  listaHorizontal: {
-    paddingHorizontal: 20,
+
+  subtitulo: {
+    marginTop: -8,
+    fontSize: 11,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.95)",
+    textShadowColor: "rgba(0, 0, 0, 0.6)",
+    textShadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    textShadowRadius: 2,
+  },
+
+  cardsContainer: {
+    flex: 1,
+    width: "100%",
+    flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    justifyContent: "center",
+    gap: 14,
   },
+
+  cardWrapper: {
+    width: 170,
+    height: 205,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  cardCentro: {
+    transform: [{ scale: 1.05 }],
+    zIndex: 10,
+    elevation: 10,
+  },
+
+  cardLateral: {
+    transform: [{ scale: 0.82 }],
+    zIndex: 1,
+    opacity: 0.85,
+    elevation: 2,
+  },
+
+  controles: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 2,
+  },
+
+  bolinhas: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 9,
+  },
+
+  bolinha: {
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: "rgba(255,255,255,0.45)",
+  },
+
+  bolinhaSelecionada: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#FFD447",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+    elevation: 3,
+  },
+
   botao: {
-    margin: 0,
-    padding: 0,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    minWidth: 180,
+    height: 38,
+    paddingHorizontal: 22,
+    borderRadius: 20,
+    backgroundColor: "#1689D5",
+    borderWidth: 2,
+    borderColor: "#075C91",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
     elevation: 5,
   },
-  pressionado: {
-    opacity: 0.8,
-    transform: [
-      {
-        scale: 0.95,
-      },
-    ],
+
+  botaoPressionado: {
+    transform: [{ scale: 0.95 }],
+    opacity: 0.9,
+  },
+
+  textoBotao: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "900",
+    letterSpacing: 0.8,
+  },
+
+  setaBotao: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "900",
   },
 });

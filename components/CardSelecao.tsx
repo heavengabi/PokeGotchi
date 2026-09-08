@@ -1,17 +1,15 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Card, Text, Chip, Surface, Divider } from "react-native-paper";
-// IMPORTANTE: O 'Image' do 'expo-image' substitui o nativo do React Native para permitir a reprodução de GIFs no Android/iOS
+import { Card, Text, Chip, Divider } from "react-native-paper";
 import { Image } from "expo-image";
 
 import { PokeJogo } from "../types/pokemon";
 
-// Tipagem da prop recebida pelo componente
 interface Props {
   pokemon: PokeJogo;
+  eCentro?: boolean;
 }
 
-// Mapeamento de cores hexadecimais para cada tipo de Pokémon
 const CORES_TIPO: Record<string, string> = {
   normal: "#A8A77A",
   fire: "#F08030",
@@ -33,276 +31,166 @@ const CORES_TIPO: Record<string, string> = {
   fairy: "#EE99AC",
 };
 
-export default function CardSelecao({ pokemon }: Props) {
-  /* 
-   * TRATAMENTO DE COR DINÂMICA:
-   * Converte o nome do primeiro tipo do Pokémon para letras minúsculas 
-   * para fazer o match correto com as chaves do dicionário CORES_TIPO.
-   * Se a cor não for encontrada, o operador '??' usa "#777" (cinza) como padrão.
-   */
+export default function CardSelecao({ pokemon, eCentro = false }: Props) {
   const tipo = pokemon.tipos[0].toLowerCase();
   const corTipo = CORES_TIPO[tipo] ?? "#777";
 
   return (
-    // Borda e container externo do Card (estilo TCG)
-    <Card style={styles.cardBorder} mode="elevated" elevation={4}>
-
-      {/* Conteúdo interno com leve transparência escura */}
-      <Card.Content style={styles.cardInner}>
-
-        {/* ==================== TOPO DA CARTA ==================== */}
+    <Card style={[styles.card, eCentro && styles.cardCentro]} mode="contained">
+      <Card.Content style={styles.conteudo}>
+        {/* Topo: Número, Nome e Nível */}
         <View style={styles.topo}>
-          {/* Número do Pokémon formatado com zeros à esquerda (ex: #004) */}
-          <Text variant="labelSmall" style={styles.estagio}>
+          <Text style={styles.numero}>
             #{String(pokemon.speciesId).padStart(3, "0")}
           </Text>
 
-          {/* Nome do Pokémon em letras maiúsculas */}
-          <Text variant="titleMedium" style={styles.nome}>
+          <Text style={styles.nome} numberOfLines={1}>
             {pokemon.nome.toUpperCase()}
           </Text>
 
-          {/* Área com o Nível e Indicador de Tipo */}
-          <View style={styles.hpArea}>
-            <Text variant="labelSmall" style={styles.hpLabel}>LV</Text>
-            <Text variant="titleSmall" style={styles.hpValor}>{pokemon.nivel}</Text>
-
-            {/* Círculo colorido com a inicial do tipo do Pokémon */}
-            <Surface style={[styles.tipoCirculo, { backgroundColor: corTipo }]} elevation={0}>
-              <Text style={styles.tipoTexto}>
-                {pokemon.tipos[0].charAt(0).toUpperCase()}
-              </Text>
-            </Surface>
+          <View style={styles.nivelBadge}>
+            <Text style={styles.nivel}>LV {pokemon.nivel}</Text>
           </View>
         </View>
 
-        {/* ==================== ÁREA DA IMAGEM (GIF ANIMADO) ==================== */}
-        <View style={styles.areaImagemContainer}>
-          <View style={styles.molduraImagem}>
-            <View style={styles.fundoImagem}>
-              {/* 
-                COMPONENTE EXPO-IMAGE:
-                - source: Recebe a URL do GIF vindo da PokeAPI
-                - contentFit="contain": Garante que o GIF fique centralizado sem cortar
-                - autoplay={true}: Força o GIF a começar a mexer imediatamente ao carregar
-              */}
-              <Image
-                source={{ uri: pokemon.imagem }}
-                style={styles.pokemon}
-                contentFit="contain"
-                autoplay={true}
-              />
-            </View>
-          </View>
+        {/* Imagem */}
+        <View style={styles.imagemContainer}>
+          <Image
+            source={{ uri: pokemon.imagem }}
+            style={styles.imagem}
+            contentFit="contain"
+            autoplay
+          />
         </View>
 
-        {/* ==================== BARRA DECORATIVA ==================== */}
-        <View style={styles.barraAmarela} />
+        <Divider style={styles.divisor} />
 
-        {/* ==================== SEÇÃO DE ATAQUES / EXPERIÊNCIA ==================== */}
-        <View style={styles.secaoAtaques}>
-          {/* Linha de Experiência Atual / Próximo Nível */}
-          <View style={styles.linhaAtaque}>
-            <Text style={styles.simbolos}>★</Text>
-            <Text style={styles.nomeAtaque}>EXPERIÊNCIA</Text>
-            <Text style={styles.danoAtaque}>
-              {pokemon.experiencia}/{pokemon.experienciaProximoNivel}
-            </Text>
-          </View>
-
-          {/* Linha divisória fina com transparência */}
-          <Divider style={styles.linhaDivisoria} />
-
-          {/* Linha representando o ataque principal */}
-          <View style={styles.linhaAtaque}>
-            <Text style={styles.simbolos}>★★</Text>
-            <Text style={styles.nomeAtaque}>ESCOLHA-ME!</Text>
-            <Text style={styles.danoAtaque}>100</Text>
-          </View>
+        {/* Experiência */}
+        <View style={styles.experiencia}>
+          <Text style={styles.expTexto}>EXP</Text>
+          <Text style={styles.expValor}>
+            {pokemon.experiencia}/{pokemon.experienciaProximoNivel}
+          </Text>
         </View>
 
-        {/* ==================== RODAPÉ COM CHIPS ==================== */}
-        <View style={styles.rodape}>
-          {/* Chip indicando o Tipo do Pokémon com uma bolinha da cor correspondente */}
-          <Chip
-            compact
-            style={styles.chipRodape}
-            textStyle={styles.textChip}
-            avatar={<View style={[styles.miniTipo, { backgroundColor: corTipo }]} />}
-          >
-            TIPO: {pokemon.tipos[0].toUpperCase()}
-          </Chip>
-
-          {/* Chip indicando o Nível */}
-          <Chip compact style={styles.chipRodape} textStyle={styles.textChip}>
-            NÍVEL: ★ {pokemon.nivel}
-          </Chip>
-        </View>
-
+        {/* Tipo */}
+        <Chip
+          compact
+          style={[styles.chip, { backgroundColor: corTipo }]}
+          textStyle={styles.chipTexto}
+        >
+          {pokemon.tipos[0].toUpperCase()}
+        </Chip>
       </Card.Content>
     </Card>
   );
 }
 
-// Estilização completa do componente usando StyleSheet
 const styles = StyleSheet.create({
-  /* Container e Bordas do Card */
-  cardBorder: {
-    width: 200,
-    backgroundColor: "rgba(0, 0, 0, 0.20)", // Cor de fundo externa semi-transparente
-    borderRadius: 12,
-    margin: 8,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.25)", // Borda branca suave estilo vidro
-  },
-  cardInner: {
-    backgroundColor: "rgba(0, 0, 0, 0.15)", // Fundo interno transparente
-    borderRadius: 10,
-    padding: 6,
+  card: {
+    width: 170,
+    height: 205,
+    backgroundColor: "rgba(0, 0, 0, 0.45)", // Fundo preto semi-transparente
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 255, 255, 0.2)", // Borda sutil translúcida
+    overflow: "hidden",
   },
 
-  /* Topo do Card */
+  cardCentro: {
+    backgroundColor: "rgba(0, 0, 0, 0.65)", // Ligeiramente mais escuro para destaque
+    borderColor: "#FFD447", // Borda amarelada para o card ativo
+    borderWidth: 2,
+  },
+
+  conteudo: {
+    padding: 10,
+    height: "100%",
+    justifyContent: "space-between",
+  },
+
   topo: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 4,
   },
-  estagio: {
-    color: "#DDD",
+
+  numero: {
+    color: "rgba(255, 255, 255, 0.6)",
+    fontSize: 9,
     fontWeight: "bold",
   },
+
   nome: {
-    fontWeight: "900",
-    color: "#FFFFFF",
     flex: 1,
-    marginLeft: 4,
+    marginHorizontal: 4,
+    color: "#FFFFFF",
     fontSize: 11,
-    textShadowColor: "rgba(0, 0, 0, 0.8)", // Sombra para o texto se destacar no fundo
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  hpArea: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  hpLabel: {
-    fontWeight: "bold",
-    color: "#FFD700",
-    fontSize: 8,
-    marginRight: 1,
-  },
-  hpValor: {
     fontWeight: "900",
-    color: "#FFD700",
-    fontSize: 11,
-    marginRight: 3,
+    letterSpacing: 0.5,
   },
-  tipoCirculo: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+
+  nivelBadge: {
+    backgroundColor: "rgba(255, 212, 71, 0.2)",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#FFD447",
+  },
+
+  nivel: {
+    color: "#FFD447",
+    fontSize: 8,
+    fontWeight: "900",
+  },
+
+  imagemContainer: {
+    height: 95,
     alignItems: "center",
     justifyContent: "center",
-  },
-  tipoTexto: {
-    color: "#FFF",
-    fontSize: 7,
-    fontWeight: "bold",
-  },
-
-  /* Moldura e Imagem do Pokémon */
-  areaImagemContainer: {
-    width: "100%",
-    alignItems: "center",
-  },
-  molduraImagem: {
-    width: "100%",
-    height: 140, // Altura ajustada para destacar a animação
-    borderWidth: 1.5,
-    borderColor: "rgba(255, 255, 255, 0.4)",
-    borderRadius: 4,
-    overflow: "hidden",
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-  },
-  fundoImagem: {
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pokemon: {
-    width: 100, // Dimensões da imagem/GIF do Pokémon
-    height: 100,
-  },
-
-  /* Detalhes Decorativos */
-  barraAmarela: {
-    width: "90%",
-    height: 3,
-    backgroundColor: "#FFD700",
-    alignSelf: "center",
-    marginTop: 4,
-  },
-
-  /* Seção de Ataques */
-  secaoAtaques: {
-    paddingHorizontal: 2,
-    marginVertical: 4,
-  },
-  linhaAtaque: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     marginVertical: 2,
   },
-  simbolos: {
-    fontSize: 8,
-    color: "#FFD700",
-    width: 20,
-  },
-  nomeAtaque: {
-    fontSize: 8,
-    fontWeight: "900",
-    color: "#FFFFFF",
-    flex: 1,
-    textShadowColor: "rgba(0, 0, 0, 0.8)",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  danoAtaque: {
-    fontSize: 10,
-    fontWeight: "900",
-    color: "#FFD700",
-  },
-  linhaDivisoria: {
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    height: 1,
-    marginVertical: 3,
+
+  imagem: {
+    width: 90,
+    height: 90,
   },
 
-  /* Rodapé com Chips */
-  rodape: {
+  divisor: {
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    height: 1,
+  },
+
+  experiencia: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 4,
-    marginTop: 4,
-  },
-  chipRodape: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-    height: 22,
     alignItems: "center",
+    marginVertical: 4,
   },
-  textChip: {
-    fontSize: 7,
+
+  expTexto: {
+    color: "rgba(255, 255, 255, 0.7)",
+    fontSize: 8,
     fontWeight: "bold",
-    color: "#FFFFFF",
-    marginVertical: 0,
   },
-  miniTipo: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+
+  expValor: {
+    color: "#FFFFFF",
+    fontSize: 8,
+    fontWeight: "bold",
+  },
+
+  chip: {
+    height: 20,
+    alignSelf: "center",
+    justifyContent: "center",
+  },
+
+  chipTexto: {
+    color: "#FFFFFF",
+    fontSize: 8,
+    fontWeight: "900",
+    lineHeight: 10,
   },
 });
