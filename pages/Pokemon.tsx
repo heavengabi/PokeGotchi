@@ -1,45 +1,44 @@
-import { ScrollView, StyleSheet, Text } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import {
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 
-import Navbar from '../components/Navbar'
-import CardPoke from '../components/CardPoke'
-import Atributos from '../components/Atributos'
-import Evento from '../components/Evento'
-import { PokeJogo } from '../types/pokemon'
-import { TABELA_EVOLUCAO } from '../data/evolucoesPoke'
-import { buscarDetalhePokemon } from '../services/pokeAPI'
-import { aplicarDecaimento, obterMensagemStatus, podeTreinar } from '../utils/atributos'
-import { ganharXpEChecarEvolucao } from '../utils/pokejogo'
-import { salvarPokemon } from '../utils/progressoPokemon'
-import BotoesPoke from '../components/BotoesPoke'
+import React, { useEffect, useState } from 'react';
 
-const TempoAtributos = 5000 // passagem do tempo: atributos caem a cada 5s
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import Navbar from '../components/Navbar';
+import CardPoke from '../components/CardPoke';
+import Atributos from '../components/Atributos';
+import Evento from '../components/Evento';
+import { PokeJogo } from '../types/pokemon';
+import { TABELA_EVOLUCAO } from '../data/evolucoesPoke';
+import { buscarDetalhePokemon } from '../services/pokeAPI';
+import {
+  aplicarDecaimento,
+  obterMensagemStatus,
+  podeTreinar,
+} from '../utils/atributos';
+import { ganharXpEChecarEvolucao } from '../utils/pokejogo';
+import { salvarPokemon } from '../utils/progressoPokemon';
+import BotoesPoke from '../components/BotoesPoke';
+
+const TempoAtributos = 5000;
 
 interface Props {
-  pokemon: PokeJogo
-  setPokemon: React.Dispatch<React.SetStateAction<PokeJogo | null>>
-  Trocar: () => void
+  pokemon: PokeJogo;
+  setPokemon: React.Dispatch<React.SetStateAction<PokeJogo | null>>;
+  Trocar: () => void;
 }
 
 const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
-  const [mensagemEvento, setMensagemEvento] = useState<string | null>(null)
-  const [evoluindo, setEvoluindo] = useState(false)
+  const [mensagemEvento, setMensagemEvento] = useState<string | null>(null);
+  const [evoluindo, setEvoluindo] = useState(false);
 
-  // =====================================================
-  // SALVAR PROGRESSO
-  // =====================================================
-
-  // Alteração: salva automaticamente o Pokémon sempre que
-  // ele mudar. Isso permite que a seleção encontre a
-  // evolução depois que o jogador clicar em "Trocar".
   useEffect(() => {
-    salvarPokemon(pokemon)
-  }, [pokemon])
+    salvarPokemon(pokemon);
+  }, [pokemon]);
 
-  // Passagem do tempo (requisito 4): a cada 5s os atributos decaem.
-  // Usa a forma funcional do setState (prev => ...) porque a função do
-  // setInterval é criada uma vez só no primeiro render e, sem isso,
-  // ficaria presa enxergando sempre o pokémon daquele momento.
   useEffect(() => {
     const intervalo = setInterval(() => {
       setPokemon((prev) =>
@@ -49,30 +48,28 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
             atributos: aplicarDecaimento(prev.atributos),
           }
           : prev
-      )
-    }, TempoAtributos)
+      );
+    }, TempoAtributos);
 
-    return () => clearInterval(intervalo)
-  }, [setPokemon])
+    return () => clearInterval(intervalo);
+  }, [setPokemon]);
 
-  // Sistema de evolução (requisito 8): observa a flag "precisaEvoluir"
-  // (definida em ganharXpEChecarEvolucao quando o nível bate o necessário)
-  // e busca o próximo estágio na PokéAPI quando ela fica true.
-  // "evoluindo" evita disparar duas buscas em paralelo caso o efeito rode
-  // de novo antes da primeira terminar.
   useEffect(() => {
-    if (!pokemon.precisaEvoluir || evoluindo) return
+    if (!pokemon.precisaEvoluir || evoluindo) return;
 
-    setEvoluindo(true)
+    setEvoluindo(true);
 
     async function evoluir() {
-      const regra = TABELA_EVOLUCAO[pokemon.speciesId]
+      const regra = TABELA_EVOLUCAO[pokemon.speciesId];
 
-      if (!regra) return
+      if (!regra) {
+        setEvoluindo(false);
+        return;
+      }
 
       try {
-        const proximo = await buscarDetalhePokemon(regra.proximoId)
-        const nomeAntigo = pokemon.nome
+        const proximo = await buscarDetalhePokemon(regra.proximoId);
+        const nomeAntigo = pokemon.nome;
 
         setPokemon((prev) =>
           prev
@@ -85,50 +82,53 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
               precisaEvoluir: false,
             }
             : prev
-        )
+        );
 
         setMensagemEvento(
           `${nomeAntigo} evoluiu para ${proximo.nome}! 🎉`
-        )
+        );
       } catch (erro) {
-        console.error('Erro ao evoluir pokémon', erro)
+        console.error('Erro ao evoluir pokémon', erro);
       } finally {
-        setEvoluindo(false)
+        setEvoluindo(false);
       }
     }
 
-    evoluir()
-  }, [pokemon.precisaEvoluir, pokemon.speciesId, evoluindo])
+    evoluir();
+  }, [
+    pokemon.precisaEvoluir,
+    pokemon.speciesId,
+    evoluindo,
+  ]);
 
-  // =====================================================
-  // AÇÕES DO JOGADOR
-  // =====================================================
-
-  // Alimentar o Pokémon
-  // Recupera a fome e dá 5 XP.
   function alimentar() {
-    setMensagemEvento(null)
+    setMensagemEvento(null);
 
     const comAtributos: PokeJogo = {
       ...pokemon,
       atributos: {
         ...pokemon.atributos,
-        fome: Math.min(100, pokemon.atributos.fome + 30),
+        fome: Math.min(
+          100,
+          pokemon.atributos.fome + 30
+        ),
       },
-    }
+    };
 
-    // Toda ação agora passa pelo sistema de XP e evolução.
-    const { pokemon: atualizado, mensagem } =
-      ganharXpEChecarEvolucao(comAtributos, 5)
+    const {
+      pokemon: atualizado,
+      mensagem,
+    } = ganharXpEChecarEvolucao(
+      comAtributos,
+      5
+    );
 
-    setPokemon(atualizado)
-    setMensagemEvento(mensagem)
+    setPokemon(atualizado);
+    setMensagemEvento(mensagem);
   }
 
-  // Dormir
-  // Recupera toda a energia e dá 5 XP.
   function dormir() {
-    setMensagemEvento(null)
+    setMensagemEvento(null);
 
     const comAtributos: PokeJogo = {
       ...pokemon,
@@ -136,20 +136,22 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
         ...pokemon.atributos,
         energia: 100,
       },
-    }
+    };
 
-    // Toda ação agora passa pelo sistema de XP e evolução.
-    const { pokemon: atualizado, mensagem } =
-      ganharXpEChecarEvolucao(comAtributos, 5)
+    const {
+      pokemon: atualizado,
+      mensagem,
+    } = ganharXpEChecarEvolucao(
+      comAtributos,
+      5
+    );
 
-    setPokemon(atualizado)
-    setMensagemEvento(mensagem)
+    setPokemon(atualizado);
+    setMensagemEvento(mensagem);
   }
 
-  // Limpar / Banhar
-  // Recupera toda a higiene e dá 5 XP.
   function limpar() {
-    setMensagemEvento(null)
+    setMensagemEvento(null);
 
     const comAtributos: PokeJogo = {
       ...pokemon,
@@ -157,19 +159,20 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
         ...pokemon.atributos,
         higiene: 100,
       },
-    }
+    };
 
-    // Toda ação agora passa pelo sistema de XP e evolução.
-    const { pokemon: atualizado, mensagem } =
-      ganharXpEChecarEvolucao(comAtributos, 5)
+    const {
+      pokemon: atualizado,
+      mensagem,
+    } = ganharXpEChecarEvolucao(
+      comAtributos,
+      5
+    );
 
-    setPokemon(atualizado)
-    setMensagemEvento(mensagem)
+    setPokemon(atualizado);
+    setMensagemEvento(mensagem);
   }
 
-  // Brincar
-  // Aumenta felicidade, gasta energia e aumenta um pouco a fome.
-  // Também dá 5 XP.
   function brincar() {
     const comAtributos: PokeJogo = {
       ...pokemon,
@@ -188,22 +191,26 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
           pokemon.atributos.fome - 5
         ),
       },
-    }
+    };
 
-    const { pokemon: atualizado, mensagem } =
-      ganharXpEChecarEvolucao(comAtributos, 5)
+    const {
+      pokemon: atualizado,
+      mensagem,
+    } = ganharXpEChecarEvolucao(
+      comAtributos,
+      5
+    );
 
-    setPokemon(atualizado)
-    setMensagemEvento(mensagem)
+    setPokemon(atualizado);
+    setMensagemEvento(mensagem);
   }
 
-  // Trava: só treina se ainda tiver fome e energia acima de zero.
-  // Sem essa checagem, o jogador conseguia treinar infinitamente mesmo
-  // com o pokémon sem energia/comida nenhuma, o que não faz sentido no jogo.
   function treinar() {
     if (!podeTreinar(pokemon.atributos)) {
-      setMensagemEvento('Sem energia ou fome suficiente pra treinar!')
-      return
+      setMensagemEvento(
+        'Sem energia ou fome suficiente pra treinar!'
+      );
+      return;
     }
 
     const comAtributos: PokeJogo = {
@@ -219,20 +226,31 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
           pokemon.atributos.fome - 15
         ),
       },
-    }
-    const { pokemon: atualizado, mensagem } = ganharXpEChecarEvolucao(comAtributos, 500)
-    setPokemon(atualizado)
-    setMensagemEvento(mensagem)
+    };
+
+    const {
+      pokemon: atualizado,
+      mensagem,
+    } = ganharXpEChecarEvolucao(
+      comAtributos,
+      500
+    );
+
+    setPokemon(atualizado);
+    setMensagemEvento(mensagem);
   }
 
-  const mensagemStatus = obterMensagemStatus(pokemon.atributos)
+  const mensagemStatus =
+    obterMensagemStatus(pokemon.atributos);
 
   return (
-    <>
+    <SafeAreaView style={styles.container}>
       <Navbar Trocar={Trocar} />
 
-      <ScrollView contentContainerStyle={styles.conteudo}>
-
+      <ScrollView
+        contentContainerStyle={styles.conteudo}
+        showsVerticalScrollIndicator={false}
+      >
         <CardPoke
           pokemon={pokemon}
           mensagemStatus={mensagemStatus}
@@ -257,22 +275,28 @@ const Pokemon = ({ pokemon, setPokemon, Trocar }: Props) => {
           Treinar={treinar}
         />
       </ScrollView>
-    </>
-  )
-}
+    </SafeAreaView>
+  );
+};
 
-export default Pokemon
+export default Pokemon;
 
 const styles = StyleSheet.create({
-  conteudo: { 
-    backgroundColor: '#f5f1e8', 
-    paddingTop: 16, 
-    paddingBottom: 32, 
-    alignItems: 'center' 
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f1e8',
   },
-  rodape: { 
-    color: '#9ca3af', 
-    fontSize: 12, 
-    marginTop: 8 
+
+  conteudo: {
+    backgroundColor: '#f5f1e8',
+    paddingTop: 16,
+    paddingBottom: 32,
+    alignItems: 'center',
   },
-})
+
+  rodape: {
+    color: '#9ca3af',
+    fontSize: 12,
+    marginTop: 8,
+  },
+});

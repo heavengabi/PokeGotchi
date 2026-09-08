@@ -1,5 +1,4 @@
 
-// Consumo da PokéAPI usando fetch, conforme exigido no enunciado.
 const API = 'https://pokeapi.co/api/v2/pokemon'
 
 export interface DetalhePokemonAPI {
@@ -25,14 +24,10 @@ export async function buscarDetalhePokemon(
   return {
     id: dados.id,
     nome: dados.name,
-
-    // GIF animado usando o ID retornado pela PokéAPI
-    imagem: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${dados.id}.gif`,
-
-    tipos: dados.types.map(
-      (t: any) => t.type.name
-    ),
-
-    // a API retorna altura em decímetros e peso em hectogramas
+    imagem:
+      dados.sprites.versions['generation-v']['black-white'].animated
+        .front_default,
+    tipos: dados.types.map((t: any) => t.type.name),
   }
 }
+
